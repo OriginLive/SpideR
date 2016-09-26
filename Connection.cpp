@@ -146,7 +146,7 @@ void ConnectionManager::fetch(std::stringstream &ss)
 {
 	for (std::string temp; std::getline(ss, temp, ' ');)
 	{
-		std::regex re("([a-zA-Z/:]+[\.]+[a-zA-Z\./?=]*[^\s,@])"); // overkill for a single line search...
+		std::regex re("([a-zA-Z/:]+[\.]+[a-zA-Z\./?=]*[^\s,@\\\"])"); // overkill for a single line search...
 		std::smatch sm;
 
 		if ((temp.find('\n') != std::string::npos) && (temp.find('\n') != temp.length()))
@@ -155,11 +155,15 @@ void ConnectionManager::fetch(std::stringstream &ss)
 			ss << ' ' << temp << ' ';
 			continue;
 		}
+
 		//check for url, remove them
 		//check for dot, remove the dot
 		if (std::regex_search(temp, sm, re))
 		{
-			m_vUrl.push_back(temp);
+			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar
+			{
+				m_vUrl.push_back(sm[1]);
+			}
 			continue;
 		}
 		if (!temp.empty() && temp.at(temp.size() - 1) == '.')
@@ -172,7 +176,8 @@ void ConnectionManager::fetch(std::stringstream &ss)
 		//if ()
 	}
 
-	for (auto s : m_tree) { std::cout << s << std::endl; } 	for (auto s : m_vUrl) { std::cout << s << std::endl; }
+	for (auto s : m_tree) { std::cout << s << std::endl; } 
+//	for (auto s : m_vUrl) { std::cout << s << std::endl; }
 	std::getchar();
 }
 
