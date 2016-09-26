@@ -137,6 +137,7 @@ void ConnectionManager::Connect(std::string url)
 	this->fetch(m_buffer);
 	// digest urls and check rules
 	//spawn new url threads
+		
 	//put the buffer into a tree
 	//write down the tree
 	//merge trees and save it into the file
@@ -155,6 +156,8 @@ void ConnectionManager::fetch(std::stringstream &ss)
 			ss << ' ' << temp << ' ';
 			continue;
 		}
+
+
 
 		//check for url, remove them
 		//check for dot, remove the dot
