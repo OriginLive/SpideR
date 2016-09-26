@@ -21,7 +21,7 @@ int main() {
 
 	std::string t = "test";
 	Manager::instance().RegisterCommand("help", [=](void*) {display->WriteOut(t); });
-	Manager::instance().RegisterCommand("connect", [=](void*) { Connection c; c.MakeConnection("https://forums.bakabt.me/index.php?topic=46346.0"); });
+	Manager::instance().RegisterCommand("connect", [=](void*) { ConnectionManager cm("https://forums.bakabt.me/index.php?topic=46346.0"); });
 	//Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 
 	display = factory->create_context();

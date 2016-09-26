@@ -1,4 +1,7 @@
 #pragma once
+#ifndef MANAGER_H
+#define MANAGER_H
+
 #include <map>
 #include <string>
 #include <map>
@@ -75,3 +78,5 @@ protected:
 	Manager();
 	~Manager();
 };
+
+#endif // !MANAGER_H

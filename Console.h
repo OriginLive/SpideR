@@ -1,4 +1,8 @@
 #pragma once
+#ifndef CONSOLE_H
+#define CONSOLE_H
+
+
 #include <string>
 class Console
 {
@@ -19,3 +23,5 @@ class LinuxShell : public Console
 public:
 	void Display();
 };
+
+#endif // !CONSOLE_H

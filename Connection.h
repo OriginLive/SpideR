@@ -1,5 +1,9 @@
 #pragma once
 #define ASIO_STANDALONE 
+#ifndef CONNECTION_H
+#define CONNECTION_H
+
+
 #include<string>
 #include "asio-1.10.6\include\asio.hpp"
 #include <iostream>
@@ -7,6 +11,10 @@
 #include <regex>
 #include "Manager.h"
 #include <sstream>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <set>
 
 
 
@@ -30,19 +38,18 @@ private:
 class ConnectionManager
 {
 public:
-	void Connect(std::string url)
-	{
-		Connection c;
-		c.MakeConnection(url);
-		// get buffer
-		// digest urls and check rules
-		//spawn new url threads
-		//put the buffer into a tree
-		//write down the tree
-		//merge trees and save it into the file
-	}
+
 	std::stringstream m_buffer;
-	ConnectionManager();
+	std::vector<std::string> m_vUrl;
+	std::set<std::string> m_tree;
+	ConnectionManager(std::string url);
 	~ConnectionManager();
 
+private:
+	void Connect(std::string url);
+	void ConnectionManager::fetch(std::stringstream &ss);
+
 };
+
+
+#endif // !CONNECTION_H

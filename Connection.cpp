@@ -117,3 +117,62 @@ std::string inline Connection::stripHttp(std::string &in) {
 		return in;
 	}
 }
+
+
+
+
+ConnectionManager::ConnectionManager(std::string url)
+{
+	this->Connect(url);
+}
+
+ConnectionManager::~ConnectionManager() {};
+
+
+void ConnectionManager::Connect(std::string url)
+{
+	// get buffer
+	Connection c;
+	m_buffer = c.MakeConnection(url);
+	this->fetch(m_buffer);
+	// digest urls and check rules
+	//spawn new url threads
+	//put the buffer into a tree
+	//write down the tree
+	//merge trees and save it into the file
+}
+
+void ConnectionManager::fetch(std::stringstream &ss)
+{
+	for (std::string temp; std::getline(ss, temp, ' ');)
+	{
+		std::regex re("([a-zA-Z/:]+[\.]+[a-zA-Z\./?=]*[^\s,@])"); // overkill for a single line search...
+		std::smatch sm;
+
+		if ((temp.find('\n') != std::string::npos) && (temp.find('\n') != temp.length()))
+		{
+			std::replace(temp.begin(), temp.end(), '\n', ' ');
+			ss << ' ' << temp << ' ';
+			continue;
+		}
+		//check for url, remove them
+		//check for dot, remove the dot
+		if (std::regex_search(temp, sm, re))
+		{
+			m_vUrl.push_back(temp);
+			continue;
+		}
+		if (!temp.empty() && temp.at(temp.size() - 1) == '.')
+		{
+			temp.pop_back();
+		}
+
+
+		m_tree.insert(temp);
+		//if ()
+	}
+
+	for (auto s : m_tree) { std::cout << s << std::endl; } 	for (auto s : m_vUrl) { std::cout << s << std::endl; }
+	std::getchar();
+}
+

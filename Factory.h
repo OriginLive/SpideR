@@ -1,4 +1,8 @@
 #pragma once
+#ifndef FACTORY_H
+#define FACTORY_H
+
+
 #include "Console.h"
 #include <map>
 #include <string>
@@ -20,3 +24,5 @@ class LinuxFactory : public Factory
 {
 	Console* create_context() { return new LinuxShell; }
 };
+
+#endif // !FACTORY_H
