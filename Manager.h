@@ -64,18 +64,6 @@ public:
 		return vec;
 	}
 
-	void Connect(std::string url)
-	{
-		// get buffer
-		// digest urls and check rules
-		//spawn new url threads
-		//put the buffer into a tree
-		//write down the tree
-		//merge trees and save it into the file
-
-
-	}
-
 
 
 protected:
