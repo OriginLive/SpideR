@@ -11,7 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include "Console.h"
-
+#include <sstream>
 
 struct Settings
 {
@@ -24,6 +24,7 @@ struct Settings
 class Manager
 {
 public:
+	//template <typename T>
 	std::map<std::string, std::function<void(void*)>> m_CommandList {};
 
 	static Manager &instance() {
@@ -37,14 +38,28 @@ public:
 
 	void FireCommand(std::string in)
 	{
-		if (m_CommandList.find(in) == m_CommandList.end())
+		std::stringstream ss;
+		ss << in.data();
+		std::string temp;
+		std::getline(ss, temp, ' ');
+		if (m_CommandList.find(temp) == m_CommandList.end())
 		{
 			std::cout << "err"; //hmm  Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 		}
 		else
 		{
-			m_CommandList[in](nullptr);
+			if (temp == "connect") // ultra stupid, instead of looking for specific commands, perhaps a better use would be to have an Event class which held templated data, and an id with enum/guid.
+			{
+				std::string temp2;
+				std::getline(ss, temp2, ' ');
+				m_CommandList[temp](static_cast<void*>(&temp2));
+			}
+			else
+			{
+				m_CommandList[temp](nullptr);
+			}
 		}
+		ss.clear();
 	}
 
 	std::vector<std::string> ListCommands(const std::string &in) {

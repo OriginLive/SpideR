@@ -5,6 +5,7 @@
 #include <functional>
 #include "Manager.h"
 #include "Connection.h"
+#include <utility>
 
 Factory* factory = nullptr;
 bool IsRunning = true;
@@ -21,7 +22,7 @@ int main() {
 
 	std::string t = "test";
 	Manager::instance().RegisterCommand("help", [=](void*) {display->WriteOut(t); });
-	Manager::instance().RegisterCommand("connect", [=](void*) { ConnectionManager cm("https://forums.bakabt.me/index.php?topic=46346.0"); });
+	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionManager cm( *(static_cast<std::string*>(in)) ); });
 	//Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 
 	display = factory->create_context();
