@@ -147,6 +147,24 @@ std::set<std::string> ConnectionManager::fetch(std::stringstream &ss)
 {
 	for (std::string temp; std::getline(ss, temp, ' ');)
 	{
+		
+			switch (Manager::instance().Config->type) //Snitches be bad, what would be a better way to implement settings, perhaps by using a state->rules() callback?
+			{
+			case unchanged:
+				break;
+			case small:
+				std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+				break;
+			case firstcapital:
+				std::transform(temp.begin(), temp.begin()++, temp.begin(), ::toupper);
+				break;
+			case fullcapital:
+				std::transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
+				break;
+			default:
+				break;
+			}
+			
 		std::regex re("([a-zA-Z/:]+[\.]+[a-zA-Z\./?=]*[^\s,@\\\"])"); // overkill for a single line search...
 		std::smatch sm;
 
@@ -157,40 +175,18 @@ std::set<std::string> ConnectionManager::fetch(std::stringstream &ss)
 			continue;
 		}
 
+
+
 		//check for url, remove them
 		//check for dot, remove the dot
-
 		if (std::regex_search(temp, sm, re))
 		{
-			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar, CHECK FOR SETTINGS AND APPLY THE RULES, would be better if each command would have it's own settings/?/
+			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar, CHECK FOR SETTINGS AND APPLY THE RULES
 			{
-				std::string t;
-				switch(Manager::instance().Config->type) //Snitches be bad, what would be a better way to implement settings, perhaps by using a state->rules() callback?
-				{
-					case unchanged:
-						m_vUrl.push_back(sm[1]);
-						break;
-					case small:
-						t = sm[1];
-						std::transform(t.begin(), t.end(), t.begin(), ::tolower);
-						m_vUrl.push_back(t);
-						break;
-					case firstcapital:
-						std::transform(t.begin(), t.begin()++, t.begin(), ::toupper);
-						m_vUrl.push_back(t);
-						break;
-					case fullcapital:
-						std::transform(t.begin(), t.end(), t.begin(), ::toupper);
-						m_vUrl.push_back(t);
-						break;
-					default:
-						m_vUrl.push_back(sm[1]);
-						break;
-				}
+				m_vUrl.push_back(sm[1]);
 			}
-		}
 			continue;
-		
+		}
 		if (!temp.empty() && temp.at(temp.size() - 1) == '.')
 		{
 			temp.pop_back();
