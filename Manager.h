@@ -7,16 +7,23 @@
 #include <map>
 #include <functional>
 #include <iostream>
+#include <fstream>
 #include "Console.h"
 #include <vector>
 #include <algorithm>
 #include "Console.h"
 #include <sstream>
+#include "rapidjson\document.h"
 
-struct Settings
+enum SortingType {unchanged, small, firstcapital, fullcapital};
+
+class Settings
 {
-	int speed = 0;
-	std::string izbira = "";
+public:
+	Settings(); //Horrible :<
+	int textspeed = 0;
+	SortingType type = unchanged;
+	std::map<std::string, SortingType> eMap;
 };
 
 
@@ -82,10 +89,45 @@ public:
 		return vec;
 	}
 
+	void ReadConfig() {
+		Config = std::make_unique<Settings>();
+		
+		std::ifstream file("Settings.json", std::ifstream::in);
+		if (file.is_open()) 
+		{
+
+			std::string s;
+			file.seekg(0, std::ios::end);
+			s.reserve(file.tellg());
+			file.seekg(0, std::ios::beg);
+			s.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+			rapidjson::Document doc;
+			doc.Parse(s.c_str());
+
+			this->Config->textspeed = doc["textspeed"].GetInt();
+			auto it = this->Config->eMap.find(doc["type"].GetString());
+			if (it != this->Config->eMap.end())
+			{
+				this->Config->type = it->second;
+			}
+			else
+			{
+				std::cerr << "Wrong type, available types are \"unchanged, small, firstcapital, fullcapital\".";
+			}
+
+		}
+		else
+		{
+			std::cerr << "Error opening settings file.";
+		}
+		file.close();
+	}
 
 
 protected:
 	Console* m_display;
+	std::unique_ptr<Settings> Config;
 	void operator=(Manager const&) = delete;
 	Manager(Manager const&) = delete;
 

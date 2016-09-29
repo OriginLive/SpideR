@@ -1,4 +1,6 @@
 {
-  "hitrost": 10,
-  "izbira": "alpha"
+  "textspeed": 10,
+  "type": "small",
+  "treedepth": 3,
+  "domain": "any"
 }

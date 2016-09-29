@@ -1,6 +1,6 @@
 #pragma once
 #include "Console.h"
-//#include "rapidjson\document.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,27 +18,7 @@
 int splashSize = 5;
 std::string input;
 void WindowsConsole::Display() 
-{/*
-	std::ifstream file("Settings.json");
-	if (file.is_open()) {
-
-		std::string s;
-		file.seekg(0, std::ios::end);
-		s.reserve(file.tellg());
-		file.seekg(0, std::ios::beg);
-		s.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
-		rapidjson::Document doc;
-		doc.Parse(s.c_str());
-
-		std::cout << "Bla bla wins";
-		std::cout << "izbira: " << doc["izbira"].GetString();
-		std::getchar();
-	}
-	else
-	{
-		std::cout << "Error opening settings file.";
-	}*/
+{
 	State = std::make_unique<SplashState>();
 	WriteOut(State->DisplayText());
 	WriteOut("	Input your command: ");
