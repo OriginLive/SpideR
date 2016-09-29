@@ -20,13 +20,16 @@ int main() {
 	factory = new LinuxFactory;
 #endif // Windows
 
+	display = factory->create_context();
+	display->Display();
+
+
 	std::string t = "test";
-	Manager::instance().RegisterCommand("help", [=](void*) {display->WriteOut(t); });
+	Manager::instance().RegisterCommand("help", [=](void*) { display->State = std::make_unique<HelpState>(); });
 	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionManager cm( *(static_cast<std::string*>(in)) ); });
 	//Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 
-	display = factory->create_context();
-	display->Display();
+	
 
 	//Manager::instance().FireCommand("Help");
 

@@ -15,13 +15,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 
-std::string splash = {
-std::string("	ReadeR, 1.0 (Freeware)\n") +
-std::string("	Made with care, 2016 by Wolk\n") +
-std::string("	(ReadR) Web spider crawler made to gather words and sort them\n") +
-std::string("	Additional usage includes AI to comprehend sentences\n\n") +
-std::string("	Type \"help\" for a list of commands\n")
-};
+int splashSize = 5;
 std::string input;
 void WindowsConsole::Display() 
 {/*
@@ -45,8 +39,8 @@ void WindowsConsole::Display()
 	{
 		std::cout << "Error opening settings file.";
 	}*/
-
-	WriteOut(splash);
+	State = std::make_unique<SplashState>();
+	WriteOut(State->DisplayText());
 	WriteOut("	Input your command: ");
 }
 
@@ -54,6 +48,8 @@ void LinuxShell::Display()
 {
 	std::cout << "Linx";
 }
+
+
 
 void Console::WriteOut(std::string in)
 {
@@ -83,7 +79,7 @@ void Console::Input()	//this part could be improved!
 			Manager::instance().FireCommand(input);
 			input.clear();
 			system("cls");
-			std::cout << splash;
+			std::cout << this->State->DisplayText();
 			Console::WriteOut("	Input your command: ");
 		}
 	}
@@ -97,7 +93,7 @@ void Console::Input()	//this part could be improved!
 				input.pop_back();
 			}
 			system("cls");
-			std::cout << splash << "	Input your command: " << input;
+			std::cout << this->State->DisplayText() << "	Input your command: " << input;
 
 		}
 	}
@@ -121,7 +117,8 @@ void Console::Input()	//this part could be improved!
 	{
 		for (auto it = vec.begin(); it < vec.end(); ++it, ++i)
 		{
-			COORD pos = { 28, 7 + (SHORT) i };
+			
+			COORD pos = { 28, (SHORT)this->State->InputLine() + (SHORT) i };
 			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 			SetConsoleCursorPosition(output, pos);
 			//remember color info
@@ -140,3 +137,26 @@ void Console::Input()	//this part could be improved!
 
 }
 
+IConsoleState::IConsoleState()
+{
+}
+
+IConsoleState::~IConsoleState()
+{
+}
+
+Console::Console()
+{
+}
+
+Console::~Console()
+{
+}
+
+SplashState::SplashState()
+{
+}
+
+SplashState::~SplashState()
+{
+}
