@@ -11,6 +11,7 @@
 #include <regex>
 #include "Manager.h"
 #include <sstream>
+#include <fstream>
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -35,7 +36,7 @@ private:
 	static asio::io_service _io_service;
 };
 
-class ConnectionManager
+class ConnectionManager // Event Logic here? Wouldn't it be smarter to use event logic in the callback?
 {
 public:
 
@@ -46,8 +47,9 @@ public:
 	~ConnectionManager();
 
 private:
+	void WriteToFile(std::set<std::string>); //Perhaps this shouldn't be here, but in a generic IO writer class /under manager?/
 	void Connect(std::string url);
-	void ConnectionManager::fetch(std::stringstream &ss);
+	std::set<std::string> ConnectionManager::fetch(std::stringstream &ss);
 
 };
 

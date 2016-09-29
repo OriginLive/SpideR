@@ -129,12 +129,12 @@ ConnectionManager::ConnectionManager(std::string url)
 ConnectionManager::~ConnectionManager() {};
 
 
-void ConnectionManager::Connect(std::string url)
+void ConnectionManager::Connect(std::string url) // Logic here
 {
 	// get buffer
 	Connection c;
 	m_buffer = c.MakeConnection(url);
-	this->fetch(m_buffer);
+	WriteToFile(this->fetch(m_buffer));
 	// digest urls and check rules
 	//spawn new url threads
 		
@@ -143,7 +143,7 @@ void ConnectionManager::Connect(std::string url)
 	//merge trees and save it into the file
 }
 
-void ConnectionManager::fetch(std::stringstream &ss)
+std::set<std::string> ConnectionManager::fetch(std::stringstream &ss)
 {
 	for (std::string temp; std::getline(ss, temp, ' ');)
 	{
@@ -157,18 +157,40 @@ void ConnectionManager::fetch(std::stringstream &ss)
 			continue;
 		}
 
-
-
 		//check for url, remove them
 		//check for dot, remove the dot
+
 		if (std::regex_search(temp, sm, re))
 		{
-			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar
+			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar, CHECK FOR SETTINGS AND APPLY THE RULES, would be better if each command would have it's own settings/?/
 			{
-				m_vUrl.push_back(sm[1]);
+				std::string t;
+				switch(Manager::instance().Config->type) //Snitches be bad, what would be a better way to implement settings, perhaps by using a state->rules() callback?
+				{
+					case unchanged:
+						m_vUrl.push_back(sm[1]);
+						break;
+					case small:
+						t = sm[1];
+						std::transform(t.begin(), t.end(), t.begin(), ::tolower);
+						m_vUrl.push_back(t);
+						break;
+					case firstcapital:
+						std::transform(t.begin(), t.begin()++, t.begin(), ::toupper);
+						m_vUrl.push_back(t);
+						break;
+					case fullcapital:
+						std::transform(t.begin(), t.end(), t.begin(), ::toupper);
+						m_vUrl.push_back(t);
+						break;
+					default:
+						m_vUrl.push_back(sm[1]);
+						break;
+				}
 			}
-			continue;
 		}
+			continue;
+		
 		if (!temp.empty() && temp.at(temp.size() - 1) == '.')
 		{
 			temp.pop_back();
@@ -179,8 +201,25 @@ void ConnectionManager::fetch(std::stringstream &ss)
 		//if ()
 	}
 
-	for (auto s : m_tree) { std::cout << s << std::endl; } 
+//	for (auto s : m_tree) { std::cout << s << std::endl; } //instead, write the progress out to the console, setstate to connecting
 //	for (auto s : m_vUrl) { std::cout << s << std::endl; }
-	std::getchar();
+	return m_tree;
 }
 
+void ConnectionManager::WriteToFile(std::set<std::string> treeIn)
+{
+	std::ofstream file("Output.txt", std::ifstream::out);
+	if (file.is_open())
+	{
+		for (auto it : treeIn)
+		{
+			file << it << std::endl;
+		}
+
+	}
+	else
+	{
+		std::cerr << "Error saving the file.";
+	}
+	file.close();
+}

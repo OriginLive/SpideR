@@ -124,10 +124,10 @@ public:
 		file.close();
 	}
 
+	std::unique_ptr<Settings> Config;
 
 protected:
 	Console* m_display;
-	std::unique_ptr<Settings> Config;
 	void operator=(Manager const&) = delete;
 	Manager(Manager const&) = delete;
 

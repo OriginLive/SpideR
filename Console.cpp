@@ -59,7 +59,7 @@ void Console::Input()	//this part could be improved!
 			Manager::instance().FireCommand(input);
 			input.clear();
 			system("cls");
-			std::cout << this->State->DisplayText();
+			WriteOut(this->State->DisplayText());
 			Console::WriteOut("	Input your command: ");
 		}
 	}
