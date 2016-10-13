@@ -49,7 +49,7 @@ public:
 private:
 	void WriteToFile(std::set<std::string>); //Perhaps this shouldn't be here, but in a generic IO writer class /under manager?/
 	void Connect(std::string url);
-	std::set<std::string> ConnectionManager::fetch(std::stringstream &ss);
+	void ConnectionManager::fetch(std::stringstream &ss);
 
 };
 

@@ -66,6 +66,7 @@ std::stringstream Connection::MakeConnection(std::string url)
 			}
 		}
 	}
+
 	return ss;
 }
 
@@ -82,6 +83,7 @@ asio::ip::tcp::endpoint Connection::Resolve(std::string s, asio::io_service &_re
 		endpoint = *iter++;
 		//std::cout << endpoint << std::endl;
 	}
+	resolver.cancel();
 	return endpoint;
 }
 
@@ -123,7 +125,42 @@ std::string inline Connection::stripHttp(std::string &in) {
 
 ConnectionManager::ConnectionManager(std::string url)
 {
-	this->Connect(url);
+	this->Connect(url); //first connection
+
+	std::vector<std::string> cmUrl = m_vUrl; //global url list
+	std::vector<std::string> currentList = cmUrl;
+
+
+	for (int i = 0; i < 3; ++i)
+	{
+
+
+
+		
+		for (auto sit : currentList)
+		{
+			this->Connect(sit);
+			for (auto it = cmUrl.begin();it != cmUrl.end(); ++it)
+			{
+				for (auto itm = m_vUrl.begin(); itm != m_vUrl.end(); ++itm)
+				{
+					if (itm->compare(*it) == 0)
+					{
+						m_vUrl.erase(itm);
+					}
+				}
+			}
+			cmUrl.insert(cmUrl.end(), m_vUrl.begin(), m_vUrl.end());
+
+			// CAN DO THIS AFTER EVENTS -> Manager::instance().FireCommand(std::string("connect ").append(sit));
+		}
+
+	};
+
+
+
+
+
 }
 
 ConnectionManager::~ConnectionManager() {};
@@ -134,7 +171,14 @@ void ConnectionManager::Connect(std::string url) // Logic here
 	// get buffer
 	Connection c;
 	m_buffer = c.MakeConnection(url);
-	WriteToFile(this->fetch(m_buffer));
+
+	this->fetch(m_buffer);
+
+	m_buffer.flush();
+
+	//WriteToFile(this->fetch(m_buffer));
+
+
 	// digest urls and check rules
 	//spawn new url threads
 		
@@ -143,7 +187,7 @@ void ConnectionManager::Connect(std::string url) // Logic here
 	//merge trees and save it into the file
 }
 
-std::set<std::string> ConnectionManager::fetch(std::stringstream &ss)
+void ConnectionManager::fetch(std::stringstream &ss)
 {
 	for (std::string temp; std::getline(ss, temp, ' ');)
 	{
@@ -199,7 +243,6 @@ std::set<std::string> ConnectionManager::fetch(std::stringstream &ss)
 
 //	for (auto s : m_tree) { std::cout << s << std::endl; } //instead, write the progress out to the console, setstate to connecting
 //	for (auto s : m_vUrl) { std::cout << s << std::endl; }
-	return m_tree;
 }
 
 void ConnectionManager::WriteToFile(std::set<std::string> treeIn)
