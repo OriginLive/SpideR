@@ -44,12 +44,20 @@ public:
 	std::vector<std::string> m_vUrl;
 	std::set<std::string> m_tree;
 	ConnectionManager(std::string url);
-	~ConnectionManager();
+	virtual ~ConnectionManager();
 
 private:
 	void WriteToFile(std::set<std::string>); //Perhaps this shouldn't be here, but in a generic IO writer class /under manager?/
-	void Connect(std::string url);
-	void ConnectionManager::fetch(std::stringstream &ss);
+	virtual void Connect(std::string url);
+	virtual void ConnectionManager::fetch(std::stringstream &ss);
+
+};
+
+
+class ConnectionDelegate : public ConnectionManager // a it of duplication and usless initialization, but hopefully it isn't too bad
+{
+public:
+	void PassData(std::vector<std::string> &urlList, std::set<std::string> &wordTree);
 
 };
 

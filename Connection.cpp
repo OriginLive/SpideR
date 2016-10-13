@@ -125,45 +125,62 @@ std::string inline Connection::stripHttp(std::string &in) {
 
 ConnectionManager::ConnectionManager(std::string url)
 {
-	this->Connect(url); //first connection
+	//this->Connect(url); //first connection
 
-	std::vector<std::string> cmUrl = m_vUrl; //global url list
-	std::vector<std::string> currentList = cmUrl;
+	std::vector<ConnectionManager> DepthList(depth);
 
-
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < depth; ++i)
 	{
 
-
-
-		
-		for (auto sit : currentList)
+		if (i == 0)
 		{
-			this->Connect(sit);
-			for (auto it = cmUrl.begin();it != cmUrl.end(); ++it)
+			DepthList[0].Connect(url);
+			continue;
+		}
+		for (auto sit : DepthList[i - 1].m_vUrl)
+		{
+			ConnectionDelegate del(sit);
+
+			del.PassData(DepthList[i].m_vUrl, DepthList[i].m_tree);
+
+
+		}
+
+		for (int j = i-1; j >= 0; --j)
+		{
+			for (auto it = DepthList[j].m_vUrl.begin(); it != DepthList[j].m_vUrl.end(); ++it)
 			{
-				for (auto itm = m_vUrl.begin(); itm != m_vUrl.end(); ++itm)
+				for (auto itm = DepthList[depth].m_vUrl.begin(); itm != DepthList[depth].m_vUrl.end(); ++itm)
 				{
 					if (itm->compare(*it) == 0)
 					{
-						m_vUrl.erase(itm);
+						DepthList[depth].m_vUrl.erase(itm);
 					}
 				}
 			}
-			cmUrl.insert(cmUrl.end(), m_vUrl.begin(), m_vUrl.end());
+		}
+
+		DepthList[0].m_tree.insert(DepthList[depth].m_tree.begin(), DepthList[depth].m_tree.end());
 
 			// CAN DO THIS AFTER EVENTS -> Manager::instance().FireCommand(std::string("connect ").append(sit));
-		}
 
 	};
 
 
-
+	WriteToFile(DepthList[0].m_tree);
 
 
 }
 
 ConnectionManager::~ConnectionManager() {};
+
+
+
+void ConnectionDelegate::PassData(std::vector<std::string>& urlList, std::set<std::string>& wordTree)
+{
+	urlList.insert(urlList.end(), this->m_vUrl.begin(), this->m_vUrl.end());
+	wordTree.insert(this->m_tree.begin(), this->m_tree.end());
+}
 
 
 void ConnectionManager::Connect(std::string url) // Logic here
@@ -175,8 +192,6 @@ void ConnectionManager::Connect(std::string url) // Logic here
 	this->fetch(m_buffer);
 
 	m_buffer.flush();
-
-	//WriteToFile(this->fetch(m_buffer));
 
 
 	// digest urls and check rules
