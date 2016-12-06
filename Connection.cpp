@@ -145,7 +145,6 @@ void Connection::filter_stream()
 	std::string line;
 	while (std::getline(socket, line) && line != "\r")
 	{
-		std::cout << line << std::endl;
 	}
 	
 	while (std::getline(socket, line))
