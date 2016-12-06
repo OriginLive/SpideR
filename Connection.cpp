@@ -1,279 +1,176 @@
 #include "Connection.h"
+#include <exception>
 
 
-
-Connection::Connection()
+Connection::Connection(const std::string& geturl)
+	: url(geturl)
 {
+	host = get_host(url);
+	path = get_path(url);
+
+	std::cout << "Connecting to " << url << '\n';
+
+	socket.expires_from_now(std::chrono::milliseconds(60000));
+	resolve_connection();
+	filter_stream();
 }
 
 
 Connection::~Connection()
 {
+	socket.flush();
+	socket.close();
 }
 
 asio::io_service Connection::_io_service;
 
-std::stringstream Connection::MakeConnection(std::string url)
+/* Return 0 if there is a stream to be read */
+bool Connection::has_stream()
 {
-	std::stringstream ss;
-	asio::ip::tcp::iostream requestStream;
-	requestStream.expires_from_now(std::chrono::milliseconds(10000));
-	std::string host = this->geturl(url);
-	std::string suburl = this->getpath(url);
-
-	requestStream.connect(Resolve(host, this->_io_service));
-
-	requestStream
-		<< "GET " << suburl << " HTTP/1.1\r\n"
-		<< "Host: " << host << "\r\n"
-		<< "Connection: close\r\n\r\n";
-
-	std::string oneLine;
-	std::getline(requestStream, oneLine);
-
-	while (std::getline(requestStream, oneLine) && oneLine != "\r")
-	{
-		//std::cout << oneLine << std::endl;
-	}
-
-	while (std::getline(requestStream, oneLine))
-	{
-
-
-		std::regex re("\"(.*)\"");
-		std::smatch match;
-		if (std::regex_search(oneLine, match, re))
-		{
-			for (int i = 1; i < match.size(); ++i)
-			{
-				std::string t = match[i];
-				std::replace(t.begin(), t.end(), '<', '\0');
-				std::replace(t.begin(), t.end(), '>', '\0');
-				ss << t << std::endl;
-			}
-		}
-
-		re = (">(.*)<");
-		if (std::regex_search(oneLine, match, re))
-		{
-			for (int i = 1; i < match.size(); ++i)
-			{
-
-				std::string t = match[i];
-				std::replace(t.begin(), t.end(), '<', '\0');
-				std::replace(t.begin(), t.end(), '>', '\0');
-				ss << t << std::endl;
-			}
-		}
-	}
-
-	return ss;
+	return !(stream.rdbuf()->in_avail());
 }
 
-
-asio::ip::tcp::endpoint Connection::Resolve(std::string s, asio::io_service &_resolver)
+std::stringstream Connection::get_stream()
 {
-	asio::ip::tcp::resolver resolver(_resolver);
-	asio::ip::tcp::resolver::query query(s, "http");
-	asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
-	asio::ip::tcp::resolver::iterator end; // End marker.
-	asio::ip::tcp::endpoint endpoint;
-	while (iter != end)
-	{
-		endpoint = *iter++;
-		//std::cout << endpoint << std::endl;
-	}
-	resolver.cancel();
-	return endpoint;
+	return std::move(stream);
 }
 
-
-std::string inline Connection::getpath(std::string &in)
+std::string inline Connection::get_path(const std::string &in)
 {
-	in = stripHttp(in);
-	in = in.substr(geturl(in).length());
-	return in;
+	auto path = strip_http(in);
+	path = path.substr(get_host(path).length());
+	if (path.empty())
+	{
+		path = "/";
+	}
+	return path;
 }
 
-std::string inline Connection::geturl(std::string &in)
+std::string inline Connection::get_host(const std::string &in)
 {
-	in = stripHttp(in);
-	if (in.find("/"))
+	auto host = strip_http(in);
+	if (host.find("/"))
 	{
-		return in.substr(0, in.find("/"));
+		return host.substr(0, host.find("/"));
 	}
-	else return in;
+	else return host;
 }
 
-std::string inline Connection::stripHttp(std::string &in) {
-	if (in.compare(0, 7, "http://") == 0)
+std::string inline Connection::strip_http(const std::string &in) 
+{
+	std::string url(in);
+	if (url.compare(0, 7, "http://") == 0)
 	{
-		return in.substr(7, in.length());
+		return url.substr(7, url.length());
 	}
-	else if (in.compare(0, 8, "https://") == 0)
+	else if (url.compare(0, 8, "https://") == 0)
 	{
-		return in.substr(8, in.length());
+		return url.substr(8, url.length());
 	}
 	else
 	{
-		return in;
+		return url;
 	}
 }
 
 
-
-
-ConnectionManager::ConnectionManager(std::string url)
+void Connection::send_get()
 {
-	//this->Connect(url); //first connection
+	socket
+		<< "GET " << path << " HTTP/1.0\r\n"
+		<< "Host: " << host << " \r\n"
+		<< "User-Agent: SpideR \r\n"
+		<< "Accept: */* \r\n"
+		<< "Connection: close\r\n\r\n";
+}
 
-	std::vector<ConnectionManager> DepthList(depth);
-
-	for (int i = 0; i < depth; ++i)
+bool Connection::resolve_connection()
+{
+	
+	while (true)
 	{
+		socket.connect(host, "http");
+		send_get();
+		std::string http_version;
+		unsigned int status_code;
+		socket >> http_version;	
+		socket >> status_code;
 
-		if (i == 0)
+		switch (status_code)
 		{
-			DepthList[0].Connect(url);
-			continue;
-		}
-		for (auto sit : DepthList[i - 1].m_vUrl)
-		{
-			ConnectionDelegate del(sit);
-
-			del.PassData(DepthList[i].m_vUrl, DepthList[i].m_tree);
-
-
-		}
-
-		for (int j = i-1; j >= 0; --j)
-		{
-			for (auto it = DepthList[j].m_vUrl.begin(); it != DepthList[j].m_vUrl.end(); ++it)
+			/* Succestream */
+			case 200:
+			case 201:
+			case 202:
 			{
-				for (auto itm = DepthList[depth].m_vUrl.begin(); itm != DepthList[depth].m_vUrl.end(); ++itm)
+				std::cout << "Connected to " << url << '\n';
+				return 0;
+			}
+			
+			/* Redirection */
+			case 300:
+			case 301:
+			case 302:
+			case 307:
+			case 308:
+			{
+				/* Find new url */
+				std::string tmp;
+				while (std::getline(socket, tmp) && tmp != "\r")
 				{
-					if (itm->compare(*it) == 0)
+					if (tmp.find("Location: ") != std::string::npos)
 					{
-						DepthList[depth].m_vUrl.erase(itm);
+						auto pos = tmp.find("http");
+						url =  tmp.substr(pos);
+						host = get_host(url);
+						path = get_path(url);
+						std::cout << "Redirected to " << url << " ...\n";
 					}
 				}
-			}
-		}
-
-		DepthList[0].m_tree.insert(DepthList[depth].m_tree.begin(), DepthList[depth].m_tree.end());
-
-			// CAN DO THIS AFTER EVENTS -> Manager::instance().FireCommand(std::string("connect ").append(sit));
-
-	};
-
-
-	WriteToFile(DepthList[0].m_tree);
-
-
-}
-
-ConnectionManager::~ConnectionManager() {};
-
-
-
-void ConnectionDelegate::PassData(std::vector<std::string>& urlList, std::set<std::string>& wordTree)
-{
-	urlList.insert(urlList.end(), this->m_vUrl.begin(), this->m_vUrl.end());
-	wordTree.insert(this->m_tree.begin(), this->m_tree.end());
-}
-
-
-void ConnectionManager::Connect(std::string url) // Logic here
-{
-	// get buffer
-	Connection c;
-	m_buffer = c.MakeConnection(url);
-
-	this->fetch(m_buffer);
-
-	m_buffer.flush();
-
-
-	// digest urls and check rules
-	//spawn new url threads
-		
-	//put the buffer into a tree
-	//write down the tree
-	//merge trees and save it into the file
-}
-
-void ConnectionManager::fetch(std::stringstream &ss)
-{
-	for (std::string temp; std::getline(ss, temp, ' ');)
-	{
-		
-			switch (Manager::instance().Config->type) //Snitches be bad, what would be a better way to implement settings, perhaps by using a state->rules() callback?
-			{
-			case unchanged:
-				break;
-			case small:
-				std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
-				break;
-			case firstcapital:
-				std::transform(temp.begin(), temp.begin()++, temp.begin(), ::toupper);
-				break;
-			case fullcapital:
-				std::transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
-				break;
-			default:
+				socket.flush();
+				socket.close();
 				break;
 			}
 			
-		std::regex re("([a-zA-Z/:]+[\.]+[a-zA-Z\./?=]*[^\s,@\\\"])"); // overkill for a single line search...
-		std::smatch sm;
-
-		if ((temp.find('\n') != std::string::npos) && (temp.find('\n') != temp.length()))
-		{
-			std::replace(temp.begin(), temp.end(), '\n', ' ');
-			ss << ' ' << temp << ' ';
-			continue;
-		}
-
-
-
-		//check for url, remove them
-		//check for dot, remove the dot
-		if (std::regex_search(temp, sm, re))
-		{
-			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar, CHECK FOR SETTINGS AND APPLY THE RULES
+			default:
 			{
-				m_vUrl.push_back(sm[1]);
+				return 1;
 			}
-			continue;
 		}
-		if (!temp.empty() && temp.at(temp.size() - 1) == '.')
-		{
-			temp.pop_back();
-		}
-
-
-		m_tree.insert(temp);
-		//if ()
 	}
-
-//	for (auto s : m_tree) { std::cout << s << std::endl; } //instead, write the progress out to the console, setstate to connecting
-//	for (auto s : m_vUrl) { std::cout << s << std::endl; }
 }
 
-void ConnectionManager::WriteToFile(std::set<std::string> treeIn)
+void Connection::filter_stream()
 {
-	std::ofstream file("Output.txt", std::ifstream::out);
-	if (file.is_open())
+	std::string line;
+	while (std::getline(socket, line) && line != "\r")
 	{
-		for (auto it : treeIn)
+	}
+	
+	while (std::getline(socket, line))
+	{
+		std::regex re("\"(.*)\"");
+		std::smatch match;
+		if (std::regex_search(line, match, re))
 		{
-			file << it << std::endl;
+			for (int i = 1; i < match.size(); ++i)
+			{
+				std::string t = match[i];
+				std::replace(t.begin(), t.end(), '<', '\0');
+				std::replace(t.begin(), t.end(), '>', '\0');
+				stream << t << std::endl;
+			}
 		}
-
+		re = (">(.*)<");
+		if (std::regex_search(line, match, re))
+		{
+			for (int i = 1; i < match.size(); ++i)
+			{
+				std::string t = match[i];
+				std::replace(t.begin(), t.end(), '<', '\0');
+				std::replace(t.begin(), t.end(), '>', '\0');
+				stream << t << std::endl;
+			}
+		}
 	}
-	else
-	{
-		std::cerr << "Error saving the file.";
-	}
-	file.close();
 }

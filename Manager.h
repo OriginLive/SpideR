@@ -2,6 +2,12 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#ifdef _WIN32
+#include "rapidjson\document.h"
+#elif defined __linux__
+#include "rapidjson/document.h"
+#endif
+
 #include <map>
 #include <string>
 #include <map>
@@ -13,7 +19,7 @@
 #include <algorithm>
 #include "Console.h"
 #include <sstream>
-#include "rapidjson\document.h"
+
 
 enum SortingType {unchanged, small, firstcapital, fullcapital};
 
@@ -22,6 +28,7 @@ class Settings
 public:
 	Settings(); //Horrible :<
 	int textspeed = 0;
+	int depth = 1;
 	SortingType type = unchanged;
 	std::map<std::string, SortingType> eMap;
 };
