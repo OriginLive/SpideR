@@ -26,7 +26,7 @@ void WindowsConsole::Display()
 
 void LinuxShell::Display()
 {
-	std::cout << "Linx";
+	std::cout << "Linux";
 }
 
 

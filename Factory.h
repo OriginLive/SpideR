@@ -22,6 +22,7 @@ public:
 
 class LinuxFactory : public Factory
 {
+public:
 	Console* create_context() { return new LinuxShell; }
 };
 

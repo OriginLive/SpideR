@@ -3,9 +3,13 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#ifdef _WIN32
+#include "asio-1.10.6\include\asio.hpp"
+#elif defined __linux__
+#include "asio-1.10.6/include/asio.hpp"
+#endif
 
 #include<string>
-#include "asio-1.10.6\include\asio.hpp"
 #include <iostream>
 #include <chrono>
 #include <regex>
@@ -22,44 +26,26 @@
 class Connection
 {
 public:
-	std::stringstream MakeConnection(std::string url);
-	Connection();
+	Connection(const std::string&);
 	~Connection();
+	bool has_stream();
+	std::stringstream get_stream();
 
 private:
-	asio::ip::tcp::endpoint Resolve(std::string s, asio::io_service &_resolver);
-	std::string stripHttp(std::string&);
-	std::string geturl(std::string&);
-	std::string getpath(std::string&);
+	void send_get();
+	bool send_request();
+	bool resolve_connection();
+	void filter_stream();
+	std::string strip_http(const std::string&);
+	std::string get_host(const std::string&);
+	std::string get_path(const std::string&);
 
-	
+	asio::ip::tcp::iostream socket;
 	static asio::io_service _io_service;
+	std::stringstream stream;
+	std::string url;
+	std::string host;
+	std::string path;
 };
-
-class ConnectionManager // Event Logic here? Wouldn't it be smarter to use event logic in the callback?
-{
-public:
-
-	std::stringstream m_buffer;
-	std::vector<std::string> m_vUrl;
-	std::set<std::string> m_tree;
-	ConnectionManager(std::string url);
-	virtual ~ConnectionManager();
-
-private:
-	void WriteToFile(std::set<std::string>); //Perhaps this shouldn't be here, but in a generic IO writer class /under manager?/
-	virtual void Connect(std::string url);
-	virtual void ConnectionManager::fetch(std::stringstream &ss);
-
-};
-
-
-class ConnectionDelegate : public ConnectionManager // a it of duplication and usless initialization, but hopefully it isn't too bad
-{
-public:
-	void PassData(std::vector<std::string> &urlList, std::set<std::string> &wordTree);
-
-};
-
 
 #endif // !CONNECTION_H
