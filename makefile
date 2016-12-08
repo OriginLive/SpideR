@@ -20,15 +20,8 @@ LDFLAGS :=
 LDFLAGS += ${LIBS} ${CCFLAGS} -g
 
 
-## Trying to be cross-platform
-OS := $(shell uname)
 
-ifeq (${OS}, Windows)
-	OSFILTER += Linuxconsole.cpp
-endif
-ifeq (${OS}, Linux)
-	OSFILTER += Winconsole.cpp
-endif
+OSFILTER := Winconsole.cpp
 
 SRCS := $(filter-out $(OSFILTER), $(wildcard *.cpp))
 OBJS := $(SRCS:.cpp=.o)

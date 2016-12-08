@@ -11,7 +11,8 @@ bool IsRunning = true;
 Console* display = nullptr;
 
 
-int main() {
+int main()
+{
 
 #ifdef _WIN32
 	factory = new WindowsFactory;
@@ -24,14 +25,13 @@ int main() {
 	display->Display();
 
 	Manager::instance().RegisterCommand("help", [=](void*) { display->State = std::make_unique<HelpState>(); });
-	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionManager cm( *(static_cast<std::string*>(in)) ); });
-	//Manager::instance().RegisterCommand("quit", [=](
+	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionMaster cm( *(static_cast<std::string*>(in)) ); });
+	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
 	//Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 
 	while (IsRunning)
 	{
 		display->Input();
-		//main loop2
-
 	}
+	return 0;
 }

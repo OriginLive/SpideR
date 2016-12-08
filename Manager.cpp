@@ -65,6 +65,7 @@ void Manager::ReadConfig() {
 		doc.Parse(s.c_str());
 
 		this->Config->textspeed = doc["textspeed"].GetInt();
+		this->Config->depth = doc["depth"].GetInt();
 		auto it = this->Config->eMap.find(doc["type"].GetString());
 		if (it != this->Config->eMap.end())
 		{
@@ -79,6 +80,20 @@ void Manager::ReadConfig() {
 	else
 	{
 		std::cerr << "Error opening settings file.";
+	}
+	file.close();
+}
+
+void Manager::WriteToFile(const std::set<std::string>& data)
+{
+	std::ofstream file("Output.txt", std::ifstream::out);
+	if (file.is_open())
+	{
+		std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(file, " "));
+	}
+	else
+	{
+		std::cerr << "Error saving the file.";
 	}
 	file.close();
 }

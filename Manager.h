@@ -16,6 +16,7 @@
 #include <fstream>
 #include "Console.h"
 #include <vector>
+#include <set>
 #include <algorithm>
 #include "Console.h"
 #include <sstream>
@@ -28,7 +29,7 @@ class Settings
 public:
 	Settings(); //Horrible :<
 	int textspeed = 0;
-	int depth = 1;
+	int depth = 2;
 	SortingType type = unchanged;
 	std::map<std::string, SortingType> eMap;
 };
@@ -45,18 +46,21 @@ class Manager
 public:
 
 
-	static Manager &instance() {
+	static Manager &instance()
+	{
 		static Manager m_inst;
 		return m_inst;
 	}
 
-	 void RegisterCommand(std::string in, std::function<void(void*)> lambda) {
+	void RegisterCommand(std::string in, std::function<void(void*)> lambda)
+	{
 		m_CommandList[in] = lambda;
 	};
 
 	 void FireCommand(std::string in);
 	 std::vector<std::string> ListCommands(const std::string &in);
 	 void ReadConfig();
+	 void WriteToFile(const std::set<std::string>& data);
 
 
 

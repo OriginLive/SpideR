@@ -2,17 +2,21 @@
 #include <exception>
 
 
-Connection::Connection(const std::string& geturl)
-	: url(geturl)
+Connection::Connection(const std::string& other_url)
+	: url(other_url)
 {
 	host = get_host(url);
 	path = get_path(url);
-
 	std::cout << "Connecting to " << url << '\n';
-
-	socket.expires_from_now(std::chrono::milliseconds(60000));
+	socket.expires_from_now(std::chrono::milliseconds(10000));
 	resolve_connection();
-	filter_stream();
+	
+	/* Flush out the response header */
+	std::string tmp;
+	while (std::getline(socket, tmp) && tmp != "\r")
+	{
+	}
+	stream << socket.rdbuf();
 }
 
 
@@ -27,9 +31,10 @@ asio::io_service Connection::_io_service;
 /* Return 0 if there is a stream to be read */
 bool Connection::has_stream()
 {
-	return !(stream.rdbuf()->in_avail());
+	return (stream.rdbuf()->in_avail());
 }
 
+/* Move stream */
 std::stringstream Connection::get_stream()
 {
 	return std::move(stream);
@@ -84,10 +89,10 @@ void Connection::send_get()
 		<< "Connection: close\r\n\r\n";
 }
 
-bool Connection::resolve_connection()
+/* If the response is a redirect, try to find the new url */
+void Connection::resolve_connection()
 {
-	
-	while (true)
+	for (int redirects = 0; redirects < 10; redirects++)
 	{
 		socket.connect(host, "http");
 		send_get();
@@ -95,7 +100,6 @@ bool Connection::resolve_connection()
 		unsigned int status_code;
 		socket >> http_version;	
 		socket >> status_code;
-
 		switch (status_code)
 		{
 			/* Succestream */
@@ -103,8 +107,8 @@ bool Connection::resolve_connection()
 			case 201:
 			case 202:
 			{
-				std::cout << "Connected to " << url << '\n';
-				return 0;
+				std::cout << "Connected.\n";
+				return;
 			}
 			
 			/* Redirection */
@@ -114,17 +118,19 @@ bool Connection::resolve_connection()
 			case 307:
 			case 308:
 			{
-				/* Find new url */
 				std::string tmp;
 				while (std::getline(socket, tmp) && tmp != "\r")
 				{
-					if (tmp.find("Location: ") != std::string::npos)
+					if (tmp.find("Location: ") != std::string::npos ||
+							tmp.find("a href=") != std::string::npos ||
+							tmp.find("url=") != std::string::npos)
 					{
 						auto pos = tmp.find("http");
 						url =  tmp.substr(pos);
 						host = get_host(url);
 						path = get_path(url);
 						std::cout << "Redirected to " << url << " ...\n";
+						break;
 					}
 				}
 				socket.flush();
@@ -134,43 +140,10 @@ bool Connection::resolve_connection()
 			
 			default:
 			{
-				return 1;
+				std::cout << "Failed..\n";
+				return;
 			}
 		}
 	}
 }
 
-void Connection::filter_stream()
-{
-	std::string line;
-	while (std::getline(socket, line) && line != "\r")
-	{
-	}
-	
-	while (std::getline(socket, line))
-	{
-		std::regex re("\"(.*)\"");
-		std::smatch match;
-		if (std::regex_search(line, match, re))
-		{
-			for (int i = 1; i < match.size(); ++i)
-			{
-				std::string t = match[i];
-				std::replace(t.begin(), t.end(), '<', '\0');
-				std::replace(t.begin(), t.end(), '>', '\0');
-				stream << t << std::endl;
-			}
-		}
-		re = (">(.*)<");
-		if (std::regex_search(line, match, re))
-		{
-			for (int i = 1; i < match.size(); ++i)
-			{
-				std::string t = match[i];
-				std::replace(t.begin(), t.end(), '<', '\0');
-				std::replace(t.begin(), t.end(), '>', '\0');
-				stream << t << std::endl;
-			}
-		}
-	}
-}

@@ -33,9 +33,7 @@ public:
 
 private:
 	void send_get();
-	bool send_request();
-	bool resolve_connection();
-	void filter_stream();
+	void resolve_connection();
 	std::string strip_http(const std::string&);
 	std::string get_host(const std::string&);
 	std::string get_path(const std::string&);

@@ -1,83 +1,79 @@
 #include "ConnectionManager.h"
 #include "Connection.h"
 
-ConnectionDelegate::ConnectionDelegate(const ConnectionManager& manager)
+ConnectionMaster::ConnectionMaster(const std::string& other_url)
 {
-	m_vUrl= manager.m_vUrl;
-	m_tree = manager.m_tree;
+	std::cout << "Constructed ConnectionMaster.\n";
+	url_list.push_back(other_url);
+	max_depth = Manager::instance().Config->depth;
+	master_crawl();
 }
+
+/* Manage the whole crawling process
+ * Send urls to children and gather their results */
+void ConnectionMaster::master_crawl()
+{
+	for (int i = 0; i < max_depth && !url_list.empty(); i++)
+	{
+		std::cout << "Crawling depth " << i + 1 << " out of max_depth " << max_depth << ".\n";
+
+		/* Mark urls to be sent as visited */
+		std::copy(url_list.begin(), url_list.end(), std::inserter(urls_visited, urls_visited.end()));
+		gather_urls = (i < max_depth - 1 ? 1 : 0);
+		ConnectionManager child(url_list, gather_urls);
+		child.crawl_list();	
+		url_list.clear();
+		child.return_data(url_list, data);
+		
+		/* Remove urls already visited from the list */
+		for (auto it = url_list.begin(); it != url_list.end(); ++it)
+		{
+			auto search = urls_visited.find(*it);
+			if (search != urls_visited.end())
+			{
+				it = url_list.erase(it);
+			}
+		}
+	}
+	/* Save data */
+	Manager::instance().WriteToFile(data);
+}
+/////////////////////////////////////////////////////////////////////////////
 
 ConnectionManager::ConnectionManager()
 {
 }
 
-ConnectionManager::ConnectionManager(const std::string& url)
+
+ConnectionManager::ConnectionManager(const std::vector<std::string>& other_url_list, const bool& other_gather_urls)
+	: url_list(other_url_list), gather_urls(other_gather_urls)
 {	
-	std::vector<ConnectionManager> DepthList(depth);
-	for (int i = 0; i < depth; ++i)
+}
+
+/* Iterate through the list */
+void ConnectionManager::crawl_list()
+{
+	while (!url_list.empty())
 	{
-		if (i == 0)
-		{
-			DepthList[0].Connect(url);
-			continue;
-		}
+		auto target_url = url_list.back();
+		url_list.pop_back();
 		
-		auto sit =  DepthList.begin() + i - 1;
-		ConnectionDelegate del(*sit);
-		del.PassData(DepthList[i].m_vUrl, DepthList[i].m_tree);
-		
-		for (int j = i-1; j >= 0; --j)
+		Connection socket(target_url);
+		if (socket.has_stream())
 		{
-			for (auto it = DepthList[j].m_vUrl.begin(); it != DepthList[j].m_vUrl.end(); ++it)
-			{
-				for (auto itm = DepthList[depth].m_vUrl.begin(); itm != DepthList[depth].m_vUrl.end(); ++itm)
-				{
-					if (itm->compare(*it) == 0)
-					{
-						DepthList[depth].m_vUrl.erase(itm);
-					}
-				}
-			}
+			std::cout << "Fetched stream. Parsing...\n";
+			stream = socket.get_stream();
+			parse_stream();
 		}
-		DepthList[0].m_tree.insert(DepthList[depth].m_tree.begin(), DepthList[depth].m_tree.end());
 	}
-	WriteToFile(DepthList[0].m_tree);
 }
 
-ConnectionManager::~ConnectionManager() {};
-
-
-
-void ConnectionDelegate::PassData(std::vector<std::string>& urlList, std::set<std::string>& wordTree)
+void ConnectionManager::parse_stream()
 {
-	urlList.insert(urlList.end(), this->m_vUrl.begin(), this->m_vUrl.end());
-	wordTree.insert(this->m_tree.begin(), this->m_tree.end());
-}
-
-
-void ConnectionManager::Connect(std::string url) // Logic here
-{
-	// get buffer
-	Connection c(url);
-	std::cout << "Fetching stream.\n";
-	m_buffer = c.get_stream();
-	this->fetch(m_buffer);
-	m_buffer.flush();
-
-	// digest urls and check rules
-	//spawn new url threads
-		
-	//put the buffer into a tree
-	//write down the tree
-	//merge trees and save it into the file
-}
-
-void ConnectionManager::fetch(std::stringstream &ss)
-{
-	for (std::string temp; std::getline(ss, temp, ' ');)
+	for (std::string temp; std::getline(stream, temp, ' ');)
 	{
-			switch (Manager::instance().Config->type) //Snitches be bad, what would be a better way to implement settings, perhaps by using a state->rules() callback?
-			{
+		switch (Manager::instance().Config->type)
+		{
 			case unchanged:
 				break;
 			case small:
@@ -91,54 +87,34 @@ void ConnectionManager::fetch(std::stringstream &ss)
 				break;
 			default:
 				break;
-			}
-			
-		std::regex re("([a-zA-Z/:]+[\.]+[a-zA-Z\./?=]*[^\s,@\\\"])"); // overkill for a single line search...
-		std::smatch sm;
-
-		if ((temp.find('\n') != std::string::npos) && (temp.find('\n') != temp.length()))
-		{
-			std::replace(temp.begin(), temp.end(), '\n', ' ');
-			ss << ' ' << temp << ' ';
-			continue;
-		}
-
-
-
-		//check for url, remove them
-		//check for dot, remove the dot
-		if (std::regex_search(temp, sm, re))
-		{
-			if (sm[1].str().substr(sm[1].str().size() - 4) != ".gif") // add moar, CHECK FOR SETTINGS AND APPLY THE RULES
-			{
-				m_vUrl.push_back(sm[1]);
-			}
-			continue;
-		}
-		if (!temp.empty() && temp.at(temp.size() - 1) == '.')
-		{
-			temp.pop_back();
 		}
 		
-		std::cout << temp << '\n';
-		m_tree.insert(temp);
-		//if ()
+		std::regex imageexpr{"(.*(jpg|png|bmp|gif)+$)"};
+		std::regex urlexpr{"([a-zA-Z/:]+[\\.]+[a-zA-Z\\./?=]*[^\\s,@\\\"])"};
+		std::regex tagexpr{"<[^>]+>"};
+		std::smatch match;
+		
+		/* Remove image links and tags (?) */
+		if (std::regex_search(temp, match, imageexpr) || std::regex_search(temp, match, tagexpr))
+		{
+			continue;
+		}
+		/* Gather other urls */
+		if (gather_urls)
+		{
+			if (std::regex_search(temp, match, urlexpr))
+			{
+				urls_gathered.insert(match.str());
+			}
+		}
+		data_gathered.push_back(temp);
 	}
 	
 }
 
-void ConnectionManager::WriteToFile(std::set<std::string> treeIn)
+void ConnectionManager::return_data(std::vector<std::string>& master_url_list, std::set<std::string>& master_data)
 {
-	std::ofstream file("Output.txt", std::ifstream::out);
-	if (file.is_open())
-	{
-		std::copy(treeIn.begin(), treeIn.end(), std::ostream_iterator<std::string>(file, " "));
-	}
-	else
-	{
-		std::cerr << "Error saving the file.";
-	}
-	file.close();
+	std::copy(urls_gathered.begin(), urls_gathered.end(), std::back_inserter(master_url_list));
+	std::copy(data_gathered.begin(), data_gathered.end(), std::inserter(master_data, master_data.end()));
 }
-
 
