@@ -94,8 +94,8 @@ void ConnectionManager::parse_stream()
 		std::regex tagexpr{"<[^>]+>"};
 		std::smatch match;
 		
-		/* Remove image links and tags (?) */
-		if (std::regex_search(temp, match, imageexpr) || std::regex_search(temp, match, tagexpr))
+		/* Remove image links */
+		if (std::regex_search(temp, match, imageexpr))
 		{
 			continue;
 		}
@@ -106,6 +106,11 @@ void ConnectionManager::parse_stream()
 			{
 				urls_gathered.insert(match.str());
 			}
+		}
+		/* Remove tags */
+		if (std::regex_search(temp, match, tagexpr))
+		{
+			continue;
 		}
 		data_gathered.push_back(temp);
 	}
