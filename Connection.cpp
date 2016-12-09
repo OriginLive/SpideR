@@ -126,9 +126,17 @@ void Connection::resolve_connection()
 							tmp.find("url=") != std::string::npos)
 					{
 						auto pos = tmp.find("http");
-						url =  tmp.substr(pos);
-						host = get_host(url);
-						path = get_path(url);
+						if (pos != std::string::npos)
+						{
+							url =  tmp.substr(pos);
+							host = get_host(url);
+							path = get_path(url);
+						}
+						else if ((pos = tmp.find("/")) && pos != std::string::npos)
+						{
+							path = tmp.substr(pos);
+							url = host + path;
+						}
 						std::cout << "Redirected to " << url << " ...\n";
 						break;
 					}
