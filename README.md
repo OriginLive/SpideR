@@ -1,8 +1,6 @@
 ## SpideR
 
-!!!  
-NOTE: A lot of functionality is still missing. This will be rectified eventually.  
-!!!  
+***NOTE: A lot of functionality is still missing. This will be rectified eventually.***  
 
 A web crawler engine that gathers data, sorts it and outputs it to file.  
 The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.  
@@ -18,6 +16,7 @@ Settings are set through the Settings.json file.
 The settings currently available are:  
 textspeed : int - Does nothing atm.  
 depth : int - Determines how far it should follow links that are found. Default is 1.  
+debug : bool - Setting this to 1 sets the verbose flag for the connection. But this ends up in the parsing..  
 type : unchanged|small|firstcapital|fullcapital - Format of the words stored.  
 
 Use:  
