@@ -2,6 +2,9 @@
 
 ***NOTE: A lot of functionality is still missing. This will be rectified eventually.***  
 
+***I HAVE NOT MADE ALTERATIONS TO THE WINDOWS RELATED FILES IN THIS FORK  
+IT IS THEREFORE HIGHLY DOUBTFUL THAT THEY WILL WORK***
+
 A web crawler engine that gathers data, sorts it and outputs it to file.  
 The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.  
 
