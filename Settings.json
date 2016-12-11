@@ -1,5 +1,6 @@
 {
 	"textspeed": 3,
-	"depth": 2,
+	"depth": 4,
+	"debug": 0,
 	"type": "unchanged"
 }

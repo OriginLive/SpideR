@@ -3,12 +3,10 @@ MAKE_DIR := $(PWD)
 LIB_DIR := ${MAKE_DIR}/libs
 LIB_SRCH_PATH := -L${LIB_DIR}
 
-LIBS := -pthread 
+LIBS := -lcurl -lcurlpp 
 
 INCLUDE_PATH :=
 INCLUDE_PATH += -I${LIB_DIR}
-INCLUDE_PATH += -I${LIB_DIR}/asio-1.10.6/include
-INCLUDE_PATH += -I${LIB_DIR}/asio-1.10.6/include/asio
 INCLUDE_PATH += -I${LIB_DIR}/rapidjson
 
 CC := g++

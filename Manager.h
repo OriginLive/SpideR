@@ -30,6 +30,7 @@ public:
 	Settings(); //Horrible :<
 	int textspeed = 0;
 	int depth = 2;
+	bool debug;
 	SortingType type = unchanged;
 	std::map<std::string, SortingType> eMap;
 };

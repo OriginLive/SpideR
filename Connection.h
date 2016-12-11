@@ -3,13 +3,12 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#ifdef _WIN32
-#include "asio-1.10.6\include\asio.hpp"
-#elif defined __linux__
-#include "asio-1.10.6/include/asio.hpp"
-#endif
+#include <curlpp/cURLpp.hpp>
+#include <curlpp/Easy.hpp>
+#include <curlpp/Options.hpp>
 
-#include<string>
+
+#include <string>
 #include <iostream>
 #include <chrono>
 #include <regex>
@@ -26,24 +25,14 @@
 class Connection
 {
 public:
-	Connection(const std::string&);
-	~Connection();
+	Connection(const std::string&, std::stringstream& stream);
 	bool has_stream();
 	std::stringstream get_stream();
 
 private:
-	void send_get();
 	void resolve_connection();
-	std::string strip_http(const std::string&);
-	std::string get_host(const std::string&);
-	std::string get_path(const std::string&);
-
-	asio::ip::tcp::iostream socket;
-	static asio::io_service _io_service;
-	std::stringstream stream;
 	std::string url;
-	std::string host;
-	std::string path;
+	std::stringstream& streamhandle;
 };
 
 #endif // !CONNECTION_H
