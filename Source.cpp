@@ -1,3 +1,4 @@
+#include <curlpp/cURLpp.hpp>
 #include "Factory.h"
 #include <map>
 #include <string>
@@ -19,15 +20,15 @@ int main()
 #elif defined __linux__
 	factory = new LinuxFactory;
 #endif
-	Manager::instance().ReadConfig();
 
+	cURLpp::Cleanup cleanupmanager; // Automatically release network resources upon exit
+	Manager::instance().ReadConfig();
 	display = factory->create_context();
 	display->Display();
 
 	Manager::instance().RegisterCommand("help", [=](void*) { display->State = std::make_unique<HelpState>(); });
 	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionMaster cm( *(static_cast<std::string*>(in)) ); });
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
-	//Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 
 	while (IsRunning)
 	{

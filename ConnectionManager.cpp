@@ -58,13 +58,13 @@ void ConnectionManager::crawl_list()
 		auto target_url = url_list.back();
 		url_list.pop_back();
 		
-		Connection socket(target_url);
-		if (socket.has_stream())
+		Connection socket(target_url, stream);
+		if (stream.rdbuf()->in_avail()) // If stream is not empty
 		{
 			std::cout << "Fetched stream. Parsing...\n";
-			stream = socket.get_stream();
 			parse_stream();
 		}
+		stream.str(""); // Clear the stream
 	}
 }
 
@@ -104,7 +104,7 @@ void ConnectionManager::parse_stream()
 		{
 			if (std::regex_search(temp, match, urlexpr))
 			{
-				urls_gathered.insert(match.str());
+				urls_gathered.insert(match.str(0));
 			}
 		}
 		/* Remove tags */
@@ -119,6 +119,10 @@ void ConnectionManager::parse_stream()
 
 void ConnectionManager::return_data(std::vector<std::string>& master_url_list, std::set<std::string>& master_data)
 {
+	std::cout << "Size of urls_gathered: " << urls_gathered.size() << '\n'
+		  << "Size of data_gathered: " << data_gathered.size() << '\n'
+		  << "Size of master_data: " << master_data.size() << '\n';
+
 	std::copy(urls_gathered.begin(), urls_gathered.end(), std::back_inserter(master_url_list));
 	std::copy(data_gathered.begin(), data_gathered.end(), std::inserter(master_data, master_data.end()));
 }

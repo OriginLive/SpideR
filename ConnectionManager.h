@@ -3,11 +3,6 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
 
-#ifdef _WIN32
-#include "asio-1.10.6\include\asio.hpp"
-#elif defined __linux__
-#include "asio-1.10.6/include/asio.hpp"
-#endif
 
 #include<string>
 #include <iostream>
