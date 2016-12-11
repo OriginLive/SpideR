@@ -59,6 +59,7 @@ public:
 class LinuxShell : public Console
 {
 public:
+	LinuxShell();
 	void Display();
 };
 
