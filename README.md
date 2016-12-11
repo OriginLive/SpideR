@@ -7,7 +7,10 @@ NOTE: A lot of functionality is still missing. This will be rectified eventually
 A web crawler engine that gathers data, sorts it and outputs it to file.  
 The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.  
 
-Installation:  
+Requirements:  
+libcurl and the c++ wrapper libcurlpp.  
+
+Installation:
 Compile it. For linux there is a makefile that should work.  
 
 Settings:  
