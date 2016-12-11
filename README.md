@@ -9,7 +9,9 @@ A web crawler engine that gathers data, sorts it and outputs it to file.
 The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.  
 
 Requirements:  
-libcurl and the c++ wrapper libcurlpp.  
+libcurl and the c++ wrapper curlpp.  
+See: https://curl.haxx.se/libcurl/ and http://www.curlpp.org/ for downloads.  
+For arch-linux, curl is to be found in the core repos, while libcurlpp can be found in the AUR.  
 
 Installation:
 Compile it. For linux there is a makefile that should work.  
