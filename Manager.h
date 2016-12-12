@@ -2,6 +2,12 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#ifdef _WIN32
+#include "rapidjson\document.h"
+#elif defined __linux__
+#include "rapidjson/document.h"
+#endif
+
 #include <map>
 #include <string>
 #include <map>
@@ -10,10 +16,11 @@
 #include <fstream>
 #include "Console.h"
 #include <vector>
+#include <set>
 #include <algorithm>
 #include "Console.h"
 #include <sstream>
-#include "rapidjson\document.h"
+
 
 enum SortingType {unchanged, small, firstcapital, fullcapital};
 
@@ -22,6 +29,8 @@ class Settings
 public:
 	Settings(); //Horrible :<
 	int textspeed = 0;
+	int depth = 2;
+	bool debug;
 	SortingType type = unchanged;
 	std::map<std::string, SortingType> eMap;
 };
@@ -38,18 +47,21 @@ class Manager
 public:
 
 
-	static Manager &instance() {
+	static Manager &instance()
+	{
 		static Manager m_inst;
 		return m_inst;
 	}
 
-	 void RegisterCommand(std::string in, std::function<void(void*)> lambda) {
+	void RegisterCommand(std::string in, std::function<void(void*)> lambda)
+	{
 		m_CommandList[in] = lambda;
 	};
 
 	 void FireCommand(std::string in);
 	 std::vector<std::string> ListCommands(const std::string &in);
 	 void ReadConfig();
+	 void WriteToFile(const std::set<std::string>& data);
 
 
 
