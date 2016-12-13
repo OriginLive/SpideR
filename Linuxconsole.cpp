@@ -10,8 +10,25 @@
 #include "Manager.h"
 
 
-int splashSize = 5;
-std::string input;
+const std::string SplashText
+{
+"	SpideR, 1.0 (Freeware)\n"
+"	Made with care, 2016 by Origin\n"
+"	(SpideR) Web spider crawler made to gather words and sort them\n"
+"	Its modular design (will) allow it to include AI to learn and comprehend sentences\n\n"
+"	Type \"help\" for a list of commands\n"
+};
+
+const std::string HelpText
+{
+
+"	Commands:\n"
+"	\"help\" - This screen.\n"
+"	\"connect website\" - Connect to given website and crawl it based on settings.\n"
+"	\"quit\" - Exit program.\n"
+"	\n"
+};
+
 
 LinuxShell::LinuxShell()
 {
@@ -40,12 +57,15 @@ void Console::Input()	//this part could be improved!
 }
 
 
-IConsoleState::IConsoleState()
+
+std::string SplashState::DisplayText()
 {
+	return SplashText;
 }
 
-IConsoleState::~IConsoleState()
+std::string HelpState::DisplayText()
 {
+	return HelpText;
 }
 
 Console::Console()
@@ -64,20 +84,10 @@ SplashState::~SplashState()
 {
 }
 
-std::string SplashState::DisplayText() {
-
-	return  std::string("	SpideR, 1.0 (Freeware)\n") +
-		std::string("	Made with care, 2016 by Origin\n") +
-		std::string("	(SpideR) Web spider crawler made to gather words and sort them\n") +
-		std::string("	Its modular design (will) allow it to include AI to learn and comprehend sentences\n\n") +
-		std::string("	Type \"help\" for a list of commands\n");
+IConsoleState::IConsoleState()
+{
 }
 
-std::string HelpState::DisplayText() {
-
-	return  std::string("	Commands:\n") +
-		std::string("	\"help\" - This screen.\n") +
-		std::string("	\"connect website\" - Connect to given website and crawl it based on settings.\n") +
-		std::string("	\"quit\" - Exit program.\n") +
-		std::string("	\n");
+IConsoleState::~IConsoleState()
+{
 }
