@@ -8,7 +8,6 @@
 #include "ConnectionManager.h"
 #include <utility>
 
-std::unique_ptr<Factory> factory = nullptr;
 bool IsRunning = true;
 
 
@@ -16,7 +15,7 @@ int main()
 {
 
 #ifdef _WIN32
-	std::unique_ptr<WindowsFactory> factory std::make_unique<WindowsFactory>();
+	std::unique_ptr<WindowsFactory> factory = std::make_unique<WindowsFactory>();
 #elif defined __linux__
 	std::unique_ptr<LinuxFactory> factory = std::make_unique<LinuxFactory>();
 #endif
