@@ -74,7 +74,7 @@ void Manager::ReadConfig() {
 		}
 		else
 		{
-			std::cerr << "Wrong type, available types are \"unchanged, small, firstcapital, fullcapital\".";
+			std::cerr << "Wrong type, available types are \"unchanged, allsmall, firstcapital, fullcapital\".";
 		}
 
 	}
@@ -112,7 +112,7 @@ Manager::~Manager()
 Settings::Settings()
 {
 	eMap.insert(std::pair<std::string, SortingType>("unchanged", unchanged));
-	eMap.insert(std::pair<std::string, SortingType>("small", small));
+	eMap.insert(std::pair<std::string, SortingType>("allsmall", allsmall));
 	eMap.insert(std::pair<std::string, SortingType>("firstcapital", firstcapital));
 	eMap.insert(std::pair<std::string, SortingType>("fullcapital", fullcapital));
 }

@@ -41,7 +41,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>$(ProjectDir)\libs;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IntDir>$(Platform)\$(Configuration)Objects\</IntDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -54,6 +57,9 @@
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
     </Bscmake>
+    <Link>
+      <AdditionalDependencies>libcurld.lib;curlpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -71,13 +77,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="ConnectionManager.cpp" />
     <ClCompile Include="Factory.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Winconsole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Connection.h" />
+    <ClInclude Include="ConnectionManager.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="Manager.h" />

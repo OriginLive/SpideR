@@ -1,6 +1,6 @@
 {
-  "textspeed": 10,
-  "type": "small",
-  "treedepth": 3,
-  "domain": "any"
+	"textspeed": 1,
+	"depth": 1,
+	"debug": 0,
+	"type": "unchanged"
 }

@@ -27,13 +27,16 @@
     <ClCompile Include="Factory.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="Console.cpp">
-      <Filter>Source Files\util</Filter>
-    </ClCompile>
     <ClCompile Include="Manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Connection.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="ConnectionManager.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="Winconsole.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Connection.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="ConnectionManager.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
   </ItemGroup>

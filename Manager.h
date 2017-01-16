@@ -22,7 +22,7 @@
 #include <sstream>
 
 
-enum SortingType {unchanged, small, firstcapital, fullcapital};
+enum SortingType {unchanged, allsmall, firstcapital, fullcapital};
 
 class Settings
 {

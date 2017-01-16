@@ -76,7 +76,7 @@ void ConnectionManager::parse_stream()
 		{
 			case unchanged:
 				break;
-			case small:
+			case allsmall:
 				std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
 				break;
 			case firstcapital:
