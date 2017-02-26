@@ -1,5 +1,6 @@
 #include <curlpp/cURLpp.hpp>
 #include "Factory.h"
+#include <memory>
 #include <map>
 #include <string>
 #include <functional>
@@ -7,26 +8,24 @@
 #include "ConnectionManager.h"
 #include <utility>
 
-Factory* factory = nullptr;
 bool IsRunning = true;
-Console* display = nullptr;
 
 
 int main()
 {
 
 #ifdef _WIN32
-	factory = new WindowsFactory;
+	std::unique_ptr<WindowsFactory> factory = std::make_unique<WindowsFactory>();
 #elif defined __linux__
-	factory = new LinuxFactory;
+	std::unique_ptr<LinuxFactory> factory = std::make_unique<LinuxFactory>();
 #endif
 
 	cURLpp::Cleanup cleanupmanager; // Automatically release network resources upon exit
 	Manager::instance().ReadConfig();
-	display = factory->create_context();
+	std::unique_ptr<Console> display(std::move(factory->create_context()));
 	display->Display();
 
-	Manager::instance().RegisterCommand("help", [=](void*) { display->State = std::make_unique<HelpState>(); });
+	Manager::instance().RegisterCommand("help", [&](void*) { display->State = std::make_unique<HelpState>(); });
 	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionMaster cm( *(static_cast<std::string*>(in)) ); });
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
 
