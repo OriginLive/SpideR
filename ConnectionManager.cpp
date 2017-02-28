@@ -1,6 +1,5 @@
 #include "ConnectionManager.h"
 #include "Connection.h"
-#include "Parser.h"
 
 ConnectionMaster::ConnectionMaster(const std::string& other_url)
 {
@@ -21,9 +20,10 @@ void ConnectionMaster::master_crawl()
 		/* Mark urls to be sent as visited */
 		std::copy(url_list.begin(), url_list.end(), std::inserter(urls_visited, urls_visited.end()));
 		gather_urls = (i < max_depth - 1 ? 1 : 0);
-		ConnectionManager child(&url_list, &data, url_list, gather_urls);
+		ConnectionManager child(url_list, gather_urls);
+		child.crawl_list();	
 		url_list.clear();
-		child.crawl_list(); // Child returns data through ptr
+		child.return_data(url_list, data);
 		
 		/* Remove urls already visited from the list */
 		for (auto it = url_list.begin(); it != url_list.end(); ++it)
@@ -45,18 +45,8 @@ ConnectionManager::ConnectionManager()
 }
 
 
-ConnectionManager::ConnectionManager
-(
-	std::vector<std::string>* const url_pool_ptr,
-	std::set<std::string>* const data_pool_ptr,
-	const std::vector<std::string>& other_url_list,
-	const bool& other_gather_urls
-)
-	:
-	url_pool(url_pool_ptr),
-	data_pool(data_pool_ptr),
-	url_list(other_url_list),
-	gather_urls(other_gather_urls)
+ConnectionManager::ConnectionManager(const std::vector<std::string>& other_url_list, const bool& other_gather_urls)
+	: url_list(other_url_list), gather_urls(other_gather_urls)
 {	
 }
 
@@ -80,11 +70,60 @@ void ConnectionManager::crawl_list()
 
 void ConnectionManager::parse_stream()
 {
-	Parser parser(gather_urls);
-	if (parser.load_stream(stream))
+	for (std::string temp; std::getline(stream, temp, ' ');)
 	{
-		parser.traverse_tree();
-		parser.return_data(url_pool, data_pool);
+		switch (Manager::instance().Config->type)
+		{
+			case unchanged:
+				break;
+			case allsmall:
+				std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+				break;
+			case firstcapital:
+				std::transform(temp.begin(), temp.begin()++, temp.begin(), ::toupper);
+				break;
+			case fullcapital:
+				std::transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
+				break;
+			default:
+				break;
+		}
+		
+		std::regex imageexpr{"(.*(jpg|png|bmp|gif)+$)"};
+		std::regex urlexpr{"([a-zA-Z/:]+[\\.]+[a-zA-Z\\./?=]*[^\\s,@\\\"])"};
+		std::regex tagexpr{"<[^>]+>"};
+		std::smatch match;
+		
+		/* Remove image links */
+		if (std::regex_search(temp, match, imageexpr))
+		{
+			continue;
+		}
+		/* Gather other urls */
+		if (gather_urls)
+		{
+			if (std::regex_search(temp, match, urlexpr))
+			{
+				urls_gathered.insert(match.str(0));
+			}
+		}
+		/* Remove tags */
+		if (std::regex_search(temp, match, tagexpr))
+		{
+			continue;
+		}
+		data_gathered.push_back(temp);
 	}
+	
+}
+
+void ConnectionManager::return_data(std::vector<std::string>& master_url_list, std::set<std::string>& master_data)
+{
+	std::cout << "Size of urls_gathered: " << urls_gathered.size() << '\n'
+		  << "Size of data_gathered: " << data_gathered.size() << '\n'
+		  << "Size of master_data: " << master_data.size() << '\n';
+
+	std::copy(urls_gathered.begin(), urls_gathered.end(), std::back_inserter(master_url_list));
+	std::copy(data_gathered.begin(), data_gathered.end(), std::inserter(master_data, master_data.end()));
 }
 
