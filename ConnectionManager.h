@@ -4,7 +4,6 @@
 #define CONNECTIONMANAGER_H
 
 
-#include<string>
 #include <iostream>
 #include <chrono>
 #include <regex>
@@ -12,6 +11,7 @@
 #include <sstream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -40,18 +40,18 @@ class ConnectionManager
 {
 	friend class ConnectionMaster;
 public:
-	ConnectionManager(const std::vector<std::string>& url_list, const bool& gather_urls);
+	ConnectionManager(std::vector<std::string>* const url_pool_ptr, 
+	std::set<std::string>* const data_pool_ptr, 
+	const std::vector<std::string>& other_url_list, const bool& other_gather_urls);
 	ConnectionManager(); // This is to prevent the Master from running on auto like its children
 	
 	std::stringstream stream;
+	std::vector<std::string>* url_pool;
+	std::set<std::string>* data_pool;
 	std::vector<std::string> url_list;
-	std::set<std::string> urls_gathered;
-	std::vector<std::string> data_gathered;
 protected:
 	void crawl_list();
 	void parse_stream();
-	void return_data(std::vector<std::string>& master_url_list, std::set<std::string>& master_data);
-	
 	bool gather_urls;
 };
 
