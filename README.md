@@ -34,4 +34,4 @@ Example:
 ```
 connect www.google.com
 ```
-Output goes to **output.txt**. 
+Output goes to **Output.txt**. 
