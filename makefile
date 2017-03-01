@@ -3,7 +3,7 @@ MAKE_DIR := $(PWD)
 LIB_DIR := ${MAKE_DIR}/libs
 LIB_SRCH_PATH := -L${LIB_DIR}
 
-LIBS := -lcurl -lcurlpp 
+LIBS := -lcurl -lcurlpp -lgumbo
 
 INCLUDE_PATH :=
 INCLUDE_PATH += -I${LIB_DIR}
@@ -11,7 +11,7 @@ INCLUDE_PATH += -I${LIB_DIR}/rapidjson
 
 CC := g++
 CCFLAGS :=
-CCFLAGS += -Wall -Wfatal-errors -Wextra 
+CCFLAGS += -Wall -Wfatal-errors -Wextra -std=c++14 
 CCFLAGS += ${INCLUDE_PATH} ${LIB_SRCH_PATH}
 
 LDFLAGS :=

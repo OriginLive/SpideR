@@ -2,16 +2,19 @@
 
 ***NOTE: A lot of functionality is still missing. This will be rectified eventually.***  
 
-***WINDOWS PORT HAS JUST BEEN ADDED, 
+***WINDOWS PORT HAS JUST BEEN ADDED(PROBABLY BROKEN WITH GUMBO-COMMIT), 
 IT IS THEREFORE HIGHLY DOUBTFUL THAT IT WILL WORK***
 
 A web crawler engine that gathers data, sorts it and outputs it to file.  
 The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.  
 
 Requirements:  
-libcurl and the c++ wrapper curlpp.  
-See: https://curl.haxx.se/libcurl/ and http://www.curlpp.org/ for downloads.  
-For arch-linux, curl is to be found in the core repos, while libcurlpp can be found in the AUR.  
+libcurl, the c++ wrapper curlpp, and gumbo-parser..  
+See: 
+https://curl.haxx.se/libcurl/  
+http://www.curlpp.org/  
+https://github.com/google/gumbo-parser for downloads.  
+For arch-linux, curl is to be found in the core repos, while libcurlpp and gumbo-git can be found in the AUR.  
 
 Installation:
 Compile it. For linux there is a makefile that should work.  
@@ -31,4 +34,4 @@ Example:
 ```
 connect www.google.com
 ```
-Output goes to **output.txt**. 
+Output goes to **Output.txt**. 
