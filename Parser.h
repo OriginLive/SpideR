@@ -3,6 +3,8 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <sstream>
+#include <stack>
 
 #include "gumbo.h"
 
