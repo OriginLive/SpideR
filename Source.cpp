@@ -1,14 +1,20 @@
+#define NOMINMAX
 #include <curlpp/cURLpp.hpp>
 #include "Factory.h"
 #include <memory>
 #include <map>
 #include <string>
 #include <functional>
+#include <utility>
+#include <pybind11/eval.h>
+#include <Python.h>
+
 #include "Manager.h"
 #include "ConnectionManager.h"
-#include <utility>
+
 
 bool IsRunning = true;
+namespace py = pybind11;
 
 
 int main()
@@ -19,6 +25,11 @@ int main()
 #elif defined __linux__
 	std::unique_ptr<LinuxFactory> factory = std::make_unique<LinuxFactory>();
 #endif
+
+
+	Py_Initialize();
+	py::object scope = py::module::import("__main__").attr("__dict__");
+	py::eval_file("script.py", scope);
 
 	cURLpp::Cleanup cleanupmanager; // Automatically release network resources upon exit
 	Manager::instance().ReadConfig();
