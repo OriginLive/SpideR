@@ -1,12 +1,11 @@
 ## SpideR
 
-***NOTE: A lot of functionality is still missing. This will be rectified eventually.***  
-
-***WINDOWS PORT HAS JUST BEEN ADDED(PROBABLY BROKEN WITH GUMBO-COMMIT), 
-IT IS THEREFORE HIGHLY DOUBTFUL THAT IT WILL WORK***
+**NOTE: A lot of functionality is still missing. This will be rectified eventually.**
 
 A web crawler engine that gathers data, sorts it and outputs it to file.  
-The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.  
+The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.
+
+The emphasis is on speed and ease of embeddance.
 
 Requirements:  
 libcurl, the c++ wrapper curlpp, and gumbo-parser..  
