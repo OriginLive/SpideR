@@ -21,7 +21,7 @@ We currently have an expert writing automated tests, those should be up soon.
 
 ## Submitting changes
 
-Please send a [GitHub Pull Request to ReadeR](https://github.com/OriginLive/SpideR/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When you send a pull request, please use only finalized versions, which pass automated tests. For testing use your own dev branch. We can always use more test coverage. Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
+Please send a [GitHub Pull Request to SpideR](https://github.com/OriginLive/SpideR/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When you send a pull request, please use only finalized versions, which pass automated tests. For testing use your own dev branch. We can always use more test coverage. Please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
 
 Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
 
@@ -41,4 +41,4 @@ Start reading our code and you'll get the hang of it. We optimize for readabilit
   * If you're unsure about anything, don't be afraid to ask.
 
 Thanks,
-Origin, The ReadeR project
+Origin, The SpideR project
