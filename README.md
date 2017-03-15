@@ -4,7 +4,6 @@
 
 A web crawler engine that gathers data, sorts it and outputs it to file.  
 The goal is for it to be fully customizable and extensible, with possibilities for scripting the behaviour of the spiders.
-
 The emphasis is on speed and ease of embeddance.
 
 Requirements:  
