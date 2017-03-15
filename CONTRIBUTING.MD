@@ -12,8 +12,8 @@ Here are some important resources:
   * IRC: irc.rizon.net/c++ channel [#c++](irc://irc.rizon.net/c++). We're usually there during business hours. That's rizon, not freenode! Just ask about the project :)
   
 ## A small note
-The project was originally coined as the SpideR, but later renamed to ReadeR, hence the confusion.
-*ReadeR* is the current project's name
+The project was originally coined as the ReadeR, but later renamed to SpideR, hence the confusion.
+*SpideR* is the current project's name
 
 ## Testing
 
