@@ -5,8 +5,7 @@
 #include <string>
 #include <functional>
 #include "Manager.h"
-#include "ConnectionManager.h"
-#include <utility>
+#include "Queen.h"
 
 bool IsRunning = true;
 
@@ -26,7 +25,7 @@ int main()
 	display->Display();
 
 	Manager::instance().RegisterCommand("help", [&](void*) { display->State = std::make_unique<HelpState>(); });
-	Manager::instance().RegisterCommand("connect", [=](void* in) { ConnectionMaster cm( *(static_cast<std::string*>(in)) ); });
+	Manager::instance().RegisterCommand("connect", [=](void* in) { Queen q( *(static_cast<std::string*>(in)) ); });
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
 
 	while (IsRunning)

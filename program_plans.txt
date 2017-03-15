@@ -1,0 +1,17 @@
+
+
+User enters: connect 'url'
+ConnectionMaster is constructed with it
+Spawns a spider and sends it to read robots.txt
+Creates a map of domain to a vector of subdomains not to visit
+
+Spawns a spider with the initial url
+Spider creates a connection and receives a stream
+Creates a parser and passes it the stream
+parser creates a node tree for parsing
+data and urls are gathered and returned
+
+ConnectionMaster checks urls gathered against the exclusion list and already visited list
+If a new domain is encountered a spider is sent to its robots.txt to create an exclusion list for it
+
+

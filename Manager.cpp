@@ -67,6 +67,8 @@ void Manager::ReadConfig() {
 		this->Config->textspeed = doc["textspeed"].GetInt();
 		this->Config->depth = doc["depth"].GetInt();
 		this->Config->debug = doc["debug"].GetInt();
+		this->Config->polite = doc["polite"].GetInt();
+		this->Config->show_http = doc["show_http"].GetInt();
 		auto it = this->Config->eMap.find(doc["type"].GetString());
 		if (it != this->Config->eMap.end())
 		{
