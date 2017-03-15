@@ -9,7 +9,7 @@ Here are some important resources:
   * [Our roadmap](https://github.com/OriginLive/SpideR/issues/1) is the 10k foot view of where we're going, and tells you where we are.
   * Mailing list: We're using irc to talk to eachother, no mailing list yet. Find us on rizon)
   * Bugs? [Issues](https://github.com/OriginLive/SpideR/issues) is where to report them
-  * IRC: chat.freenode.net channel [#c++](irc://irc.rizon.net/c++). We're usually there during business hours. That's rizon, not freenode! Just ask about the project :)
+  * IRC: irc.rizon.net/c++ channel [#c++](irc://irc.rizon.net/c++). We're usually there during business hours. That's rizon, not freenode! Just ask about the project :)
   
 ## A small note
 The project was originally coined as the SpideR, but later renamed to ReadeR, hence the confusion.
