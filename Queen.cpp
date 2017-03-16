@@ -35,8 +35,14 @@ void Queen::check_url_pool()
 {
 	for (auto it = url_pool.begin(); it != url_pool.end(); ++it)
 	{
+		// Remove duplicates
+		auto visited_search = urls_visited.find(*it);
+		if (visited_search != urls_visited.end())
+		{
+			it = url_pool.erase(it);
+		}
 		// If we are being polite
-		if (Manager::instance().Config->polite)
+		else if (Manager::instance().Config->polite)
 		{
 			std::string host = utility_tools::get_host(*it);
 			auto exclusion_search = exclusion_list.find(host);
@@ -45,7 +51,7 @@ void Queen::check_url_pool()
 				std::string path = utility_tools::get_path(*it);
 				for (auto i : exclusion_search->second)
 				{
-					if (path.substr(0, i.length()) == i)
+					if (path.compare(0, i.length(), i) == 0)
 					{
 						it = url_pool.erase(it);
 						std::cout << "Host: " << host << " Path: " << path << " found in exclusion list. Skipping...\n";
@@ -57,13 +63,9 @@ void Queen::check_url_pool()
 			{
 				std::cout << "Fetching robots.txt from " << host<< '\n';
 				read_robots_txt(*it);
+				urls_visited.insert(host +"/robots.txt");
+				
 			}
-		}
-		// Remove duplicates
-		auto visited_search = urls_visited.find(*it);
-		if (visited_search != urls_visited.end())
-		{
-			it = url_pool.erase(it);
 		}
 	}
 }
