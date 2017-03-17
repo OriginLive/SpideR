@@ -93,7 +93,7 @@ void Manager::WriteToFile(const std::set<std::string>& data)
 	std::ofstream file("Output.txt", std::ifstream::out);
 	if (file.is_open())
 	{
-		std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(file, " "));
+		std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(file, "\n"));
 	}
 	else
 	{
