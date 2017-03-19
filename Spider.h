@@ -34,11 +34,11 @@ protected:
 class Robot_Spider : public Spider
 {
 	friend class Queen;
-	Robot_Spider(std::string host, std::map<std::string, string_vector>* master_exclusion_list);
+	Robot_Spider(std::string host, std::map<std::string, string_set>* master_exclusion_list);
 	void parse_stream();
 	
 	std::string host;
-	std::pair<std::string, std::vector<std::string>> exclusion_list;
+	std::set<std::string> exclusion_set;
 	const std::string user_agent{"User-agent: *"};
 	const std::string disallow{"Disallow: "};
 	

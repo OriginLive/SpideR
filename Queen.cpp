@@ -49,19 +49,23 @@ void Queen::check_url_pool()
 			if (exclusion_search != exclusion_list.end())
 			{
 				std::string path = utility_tools::get_path(*it);
-				for (auto i : exclusion_search->second)
+				auto path_search = (exclusion_search->second).find(path);
+				if (path_search != (exclusion_search->second).end())
 				{
-					if (path.compare(0, i.length(), i) == 0)
+					it = url_pool.erase(it);
+					if (Manager::instance().Config->debug)
 					{
-						it = url_pool.erase(it);
 						std::cout << "Host: " << host << " Path: " << path << " found in exclusion list. Skipping...\n";
-						break;
 					}
+					break;
 				}
 			}	
 			else 
 			{
-				std::cout << "Fetching robots.txt from " << host<< '\n';
+				if (Manager::instance().Config->debug)
+				{
+					std::cout << "Fetching robots.txt from " << host<< '\n';
+				}
 				read_robots_txt(*it);
 				urls_visited.insert(host +"/robots.txt");
 				
