@@ -38,7 +38,7 @@ class Robot_Spider : public Spider
 	void parse_stream();
 	
 	std::string host;
-	std::pair<std::string, std::set<std::string>> exclusion_list;
+	std::set<std::string> exclusion_set;
 	const std::string user_agent{"User-agent: *"};
 	const std::string disallow{"Disallow: "};
 	
