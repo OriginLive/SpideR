@@ -51,7 +51,7 @@ void Spider::parse_stream(std::string target_url)
 	}
 }
 
-Robot_Spider::Robot_Spider(std::string host, std::map<std::string, string_vector>* master_exclusion_list)
+Robot_Spider::Robot_Spider(std::string host, std::map<std::string, string_set>* master_exclusion_list)
 : host(host)
 {
 	std::string target_url{host + "/robots.txt"};
@@ -65,7 +65,7 @@ Robot_Spider::Robot_Spider(std::string host, std::map<std::string, string_vector
 
 void Robot_Spider::parse_stream()
 {
-	std::vector<std::string> paths;
+	std::set<std::string> paths;
 	std::string line;
 	bool get_paths = false;
 
@@ -81,7 +81,7 @@ void Robot_Spider::parse_stream()
 			if (line.substr(0, disallow.length()) == disallow)
 			{
 				path = line.substr(disallow.length(), std::string::npos);
-				paths.push_back(path);
+				paths.insert(path);
 			}
 			else
 			{
