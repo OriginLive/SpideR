@@ -49,7 +49,7 @@ private:
 	bool polite;
 	string_list url_pool;
 	string_set data_pool;
-	std::map<std::string, string_vector> exclusion_list;
+	std::map<std::string, string_set> exclusion_list;
 	std::unordered_set<std::string> urls_visited;
 };
 
