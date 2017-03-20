@@ -31,6 +31,8 @@ public:
 	int textspeed = 0;
 	int depth = 2;
 	bool debug;
+	bool polite;
+	bool show_http;
 	SortingType type = unchanged;
 	std::map<std::string, SortingType> eMap;
 };

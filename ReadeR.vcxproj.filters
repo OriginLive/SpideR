@@ -67,5 +67,8 @@
     <None Include="x64\Debug\Settings.json">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="script.py">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

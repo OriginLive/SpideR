@@ -24,7 +24,7 @@ void Connection::resolve_connection()
 	cURLpp::Easy socket;
 	cURLpp::options::WriteStream write(&streamhandle);
 	socket.setOpt(write);
-	if (Manager::instance().Config->debug)
+	if (Manager::instance().Config->show_http)
 	{
 		socket.setOpt(new cURLpp::options::Verbose(true));
 	}

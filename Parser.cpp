@@ -1,7 +1,8 @@
 #include "Parser.h"
+#include <iostream>
 
-Parser::Parser(bool other_gather_urls)
-	: output(nullptr), gather_urls(other_gather_urls)
+Parser::Parser(std::string host, bool other_gather_urls)
+	: output(nullptr), host(host),  gather_urls(other_gather_urls)
 {
 };
 
@@ -39,7 +40,7 @@ void Parser::traverse_tree()
 		{
 			if (gather_urls)
 			{
-				search_for_link(current_node);
+				get_link(current_node);
 			}
 			// Add children to stack
 			GumboVector* children = &current_node->v.element.children;
@@ -60,22 +61,40 @@ void Parser::traverse_tree()
 	}
 }
 
-void Parser::search_for_link(GumboNode* node)
+void Parser::get_link(GumboNode* node)
 {
 	if (node->v.element.tag == GUMBO_TAG_A)
 	{
 		GumboAttribute* link = gumbo_get_attribute(&node->v.element.attributes, "href");
 		if (link)
 		{
-			urls_gathered.insert(link->value);
+			auto url = format_link(link->value);
+			if (!url.empty())
+			{
+				urls_gathered.push_back(url);
+			}
 		}
 	}
 }
 
+std::string Parser::format_link(std::string link)
+{
+	std::smatch match;
+	if (std::regex_search(link, match, imageexpr))
+	{
+		link = "";
+	}
+	else if (!std::regex_search(link, match, urlexpr))
+	{
+		link = host + link;
+	}
+	std::transform(link.begin(), link.end(), link.begin(), ::tolower);
+	return link;
+}
 
 
 // Dump data to the ConnectionMaster
-void Parser::return_data(std::vector<std::string>* url_pool, std::set<std::string>* data_pool)
+void Parser::return_data(std::list<std::string>* url_pool, std::set<std::string>* data_pool)
 {
 	std::copy(urls_gathered.begin(), urls_gathered.end(), std::back_inserter((*url_pool)));
 	std::copy(data_gathered.begin(), data_gathered.end(), std::inserter(*data_pool, data_pool->end()));
