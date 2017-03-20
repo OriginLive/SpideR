@@ -77,11 +77,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Connection.cpp" />
-    <ClCompile Include="ConnectionManager.cpp" />
     <ClCompile Include="Factory.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Parser.cpp" />
+    <ClCompile Include="Queen.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Spider.cpp" />
     <ClCompile Include="Winconsole.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +92,8 @@
     <ClInclude Include="Factory.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="Queen.h" />
+    <ClInclude Include="Spider.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="script.py" />

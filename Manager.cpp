@@ -118,3 +118,32 @@ Settings::Settings()
 	eMap.insert(std::pair<std::string, SortingType>("firstcapital", firstcapital));
 	eMap.insert(std::pair<std::string, SortingType>("fullcapital", fullcapital));
 }
+
+
+
+
+
+void Logger::operator<<(std::string in)
+{
+	Log(in);
+}
+
+void Logger::Log(std::string in)
+{
+	std::time_t t = std::time(nullptr);
+	std::tm tm = *std::localtime(&t);
+	std::stringstream tstrs;
+	tstrs << std::put_time(&tm, "%c %Z");
+
+	std::string logname = "Log" + tstrs.str();
+	std::ofstream file(logname, std::ifstream::out);
+	if (file.is_open())
+	{
+		file << "\r\n" << in;
+	}
+	else
+	{
+		std::cerr << "Error saving the file.";
+	}
+	//file.close();
+}

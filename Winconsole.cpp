@@ -57,7 +57,7 @@ void Console::Input()	//this part could be improved!
 			input.pop_back();
 			//input = input.substr(0, input.length() - 2);
 			Manager::instance().FireCommand(input);
-			input.clear();
+			input.clear(); // Press enter to return
 			system("cls");
 			WriteOut(this->State->DisplayText());
 			Console::WriteOut("	Input your command: ");

@@ -20,6 +20,9 @@
 #include <algorithm>
 #include "Console.h"
 #include <sstream>
+#include <chrono>
+#include <iomanip>
+#include <ctime>
 
 
 enum SortingType {unchanged, allsmall, firstcapital, fullcapital};
@@ -36,6 +39,28 @@ public:
 	SortingType type = unchanged;
 	std::map<std::string, SortingType> eMap;
 };
+
+
+//
+// LOGGER
+//
+
+
+class Logger
+{
+public:
+	void operator<<(std::string);
+	void Log(std::string);
+
+
+
+
+
+};
+
+
+
+
 
 
 
@@ -71,6 +96,11 @@ public:
 	std::unique_ptr<Settings> Config;
 	//template <typename T>
 	std::map<std::string, std::function<void(void*)>> m_CommandList{};
+
+	void Log(std::string);
+
+
+
 
 protected:
 	Console* m_display;
