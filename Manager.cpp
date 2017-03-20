@@ -131,7 +131,7 @@ void Logger::operator<<(std::string in)
 void Logger::Log(std::string in)
 {
 	std::time_t t = std::time(nullptr);
-	std::tm tm = *std::localtime(&t);
+	std::tm tm = *std::localtime(&t); // localtime :/
 	std::stringstream tstrs;
 	tstrs << std::put_time(&tm, "%c %Z");
 
