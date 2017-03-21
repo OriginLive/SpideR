@@ -130,20 +130,28 @@ void Logger::operator<<(std::string in)
 
 void Logger::Log(std::string in)
 {
-	std::time_t t = std::time(nullptr);
-	std::tm tm = *std::localtime(&t); // localtime :/
-	std::stringstream tstrs;
-	tstrs << std::put_time(&tm, "%c %Z");
+	auto now = std::chrono::system_clock::now();
+	std::time_t start_time = std::chrono::system_clock::to_time_t(now);
+	std::stringstream tempstrs;
+	char timedisplay[100];
+	struct tm buf;
+	errno_t err = localtime_s(&buf, &start_time);
+	if (std::strftime(timedisplay, sizeof(timedisplay), "%F %H.%M.%S", &buf))
+	{
+		tempstrs << timedisplay;
+	}
 
-	std::string logname = "Log" + tstrs.str();
+	std::string logname = "Log " + tempstrs.str()+".txt";
 	std::ofstream file(logname, std::ifstream::out);
 	if (file.is_open())
 	{
-		file << "\r\n" << in;
+		file << in << "\r\n";
 	}
 	else
 	{
 		std::cerr << "Error saving the file.";
+		char error[128];
+		std::cerr << strerror_s(error,128,errno);
 	}
 	//file.close();
 }

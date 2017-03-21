@@ -25,6 +25,8 @@ int main()
 	std::unique_ptr<LinuxFactory> factory = std::make_unique<LinuxFactory>();
 #endif
 
+	Logger l;
+	l.Log("test");
 
 	//Py_Initialize();
 	//py::object scope = py::module::import("__main__").attr("__dict__");
