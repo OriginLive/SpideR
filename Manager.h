@@ -51,10 +51,25 @@ public:
 	void operator<<(std::string);
 	void Log(std::string);
 
+	static Logger &instance()
+	{
+		static Logger m_inst;
+		return m_inst;
+	}
+
+	void SetLog();
+private:
+	void m_Log(std::string);
+	std::string m_logname ="Log";
+	std::ofstream m_file;
+
+protected:
+	void operator=(Logger const&) = delete;
+	Logger(Logger const&) = delete;
 
 
-
-
+	Logger();
+	~Logger();
 };
 
 
@@ -88,21 +103,18 @@ public:
 	 std::vector<std::string> ListCommands(const std::string &in);
 	 void ReadConfig();
 	 void WriteToFile(const std::set<std::string>& data);
+	 void SetDisplay(std::shared_ptr<Console>);
 
 
 
-
-	std::unique_ptr<Settings> Config;
-	//template <typename T>
-	std::map<std::string, std::function<void(void*)>> m_CommandList{};
-
-	void Log(std::string);
-
-
+	 std::shared_ptr<Console> m_display;
+   	 std::unique_ptr<Settings> Config;
+	 //template <typename T>
+	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
 
 
 protected:
-	Console* m_display;
+	
 	void operator=(Manager const&) = delete;
 	Manager(Manager const&) = delete;
 
