@@ -22,6 +22,7 @@ Connection::Connection(const std::string& other_url, std::stringstream& stream)
 void Connection::resolve_connection()
 {
 	cURLpp::Easy socket;
+	socket.setOpt(new curlpp::options::SslVerifyPeer(false));
 	cURLpp::options::WriteStream write(&streamhandle);
 	socket.setOpt(write);
 	if (Manager::instance().Config->show_http)

@@ -1,6 +1,8 @@
 {
 	"textspeed": 1,
-	"depth": 1,
-	"debug": 0,
+	"depth": 3,
+	"debug": 1,
+	"polite": 1,
+	"show_http": 0,
 	"type": "unchanged"
 }

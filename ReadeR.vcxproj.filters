@@ -36,11 +36,14 @@
     <ClCompile Include="Winconsole.cpp">
       <Filter>Source Files\util</Filter>
     </ClCompile>
-    <ClCompile Include="ConnectionManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Parser.cpp">
       <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="Queen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Spider.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,18 +59,21 @@
     <ClInclude Include="Connection.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
-    <ClInclude Include="ConnectionManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Parser.h">
       <Filter>Header Files\util</Filter>
     </ClInclude>
+    <ClInclude Include="Queen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Spider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="x64\Debug\Settings.json">
+    <None Include="script.py">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="script.py">
+    <None Include="Settings.json">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
