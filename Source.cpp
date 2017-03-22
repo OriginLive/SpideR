@@ -26,13 +26,14 @@ int main()
 #endif
 
 
-	Py_Initialize();
-	py::object scope = py::module::import("__main__").attr("__dict__");
-	py::eval_file("script.py", scope);
+	//Py_Initialize();
+	//py::object scope = py::module::import("__main__").attr("__dict__");
+	//py::eval_file("script.py", scope);
 
 	cURLpp::Cleanup cleanupmanager; // Automatically release network resources upon exit
 	Manager::instance().ReadConfig();
-	std::unique_ptr<Console> display(std::move(factory->create_context()));
+	std::shared_ptr<Console> display(std::move(factory->create_context()));
+	Manager::instance().SetDisplay(display);
 	display->Display();
 
 	Manager::instance().RegisterCommand("help", [&](void*) { display->State = std::make_unique<HelpState>(); });

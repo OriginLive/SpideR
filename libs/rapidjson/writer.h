@@ -16,6 +16,7 @@
 #define RAPIDJSON_WRITER_H_
 
 #include "stream.h"
+#include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
 #include "internal/dtoa.h"
@@ -42,6 +43,7 @@ RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(unreachable-code)
+RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -63,7 +65,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 enum WriteFlag {
     kWriteNoFlags = 0,              //!< No flags are set.
     kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
-    kWriteNanAndInfFlag = 2,        //!< Allow writing of Inf, -Inf and NaN.
+    kWriteNanAndInfFlag = 2,        //!< Allow writing of Infinity, -Infinity and NaN.
     kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS  //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
 };
 
@@ -102,6 +104,13 @@ public:
     explicit
     Writer(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
         os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    Writer(Writer&& rhs) :
+        os_(rhs.os_), level_stack_(std::move(rhs.level_stack_)), maxDecimalPlaces_(rhs.maxDecimalPlaces_), hasRoot_(rhs.hasRoot_) {
+        rhs.os_ = 0;
+    }
+#endif
 
     //! Reset the writer with a new stream.
     /*!
@@ -169,30 +178,32 @@ public:
     */
     //@{
 
-    bool Null()                 { Prefix(kNullType);   return WriteNull(); }
-    bool Bool(bool b)           { Prefix(b ? kTrueType : kFalseType); return WriteBool(b); }
-    bool Int(int i)             { Prefix(kNumberType); return WriteInt(i); }
-    bool Uint(unsigned u)       { Prefix(kNumberType); return WriteUint(u); }
-    bool Int64(int64_t i64)     { Prefix(kNumberType); return WriteInt64(i64); }
-    bool Uint64(uint64_t u64)   { Prefix(kNumberType); return WriteUint64(u64); }
+    bool Null()                 { Prefix(kNullType);   return EndValue(WriteNull()); }
+    bool Bool(bool b)           { Prefix(b ? kTrueType : kFalseType); return EndValue(WriteBool(b)); }
+    bool Int(int i)             { Prefix(kNumberType); return EndValue(WriteInt(i)); }
+    bool Uint(unsigned u)       { Prefix(kNumberType); return EndValue(WriteUint(u)); }
+    bool Int64(int64_t i64)     { Prefix(kNumberType); return EndValue(WriteInt64(i64)); }
+    bool Uint64(uint64_t u64)   { Prefix(kNumberType); return EndValue(WriteUint64(u64)); }
 
     //! Writes the given \c double value to the stream
     /*!
         \param d The value to be written.
         \return Whether it is succeed.
     */
-    bool Double(double d)       { Prefix(kNumberType); return WriteDouble(d); }
+    bool Double(double d)       { Prefix(kNumberType); return EndValue(WriteDouble(d)); }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
+        RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kNumberType);
-        return WriteString(str, length);
+        return EndValue(WriteString(str, length));
     }
 
     bool String(const Ch* str, SizeType length, bool copy = false) {
+        RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kStringType);
-        return WriteString(str, length);
+        return EndValue(WriteString(str, length));
     }
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -211,13 +222,11 @@ public:
 
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
-        RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
-        RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
+        RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level)); // not inside an Object
+        RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray); // currently inside an Array, not Object
+        RAPIDJSON_ASSERT(0 == level_stack_.template Top<Level>()->valueCount % 2); // Object has a Key without a Value
         level_stack_.template Pop<Level>(1);
-        bool ret = WriteEndObject();
-        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
-            os_->Flush();
-        return ret;
+        return EndValue(WriteEndObject());
     }
 
     bool StartArray() {
@@ -231,10 +240,7 @@ public:
         RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
         RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
         level_stack_.template Pop<Level>(1);
-        bool ret = WriteEndArray();
-        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
-            os_->Flush();
-        return ret;
+        return EndValue(WriteEndArray());
     }
     //@}
 
@@ -242,9 +248,9 @@ public:
     //@{
 
     //! Simpler but slower overload.
-    bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
-    bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
-
+    bool String(const Ch* const& str) { return String(str, internal::StrLen(str)); }
+    bool Key(const Ch* const& str) { return Key(str, internal::StrLen(str)); }
+    
     //@}
 
     //! Write a raw JSON value.
@@ -255,7 +261,19 @@ public:
         \param length Length of the json.
         \param type Type of the root of json.
     */
-    bool RawValue(const Ch* json, size_t length, Type type) { Prefix(type); return WriteRawValue(json, length); }
+    bool RawValue(const Ch* json, size_t length, Type type) {
+        RAPIDJSON_ASSERT(json != 0);
+        Prefix(type);
+        return EndValue(WriteRawValue(json, length));
+    }
+
+    //! Flush the output stream.
+    /*!
+        Allows the user to flush the output stream immediately.
+     */
+    void Flush() {
+        os_->Flush();
+    }
 
 protected:
     //! Information for each nested level
@@ -289,7 +307,7 @@ protected:
         const char* end = internal::i32toa(i, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -298,7 +316,7 @@ protected:
         const char* end = internal::u32toa(u, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -307,7 +325,7 @@ protected:
         const char* end = internal::i64toa(i64, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -316,7 +334,7 @@ protected:
         char* end = internal::u64toa(u64, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -344,12 +362,12 @@ protected:
         char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
     bool WriteString(const Ch* str, SizeType length)  {
-        static const typename TargetEncoding::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        static const typename OutputStream::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
             //0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -405,7 +423,7 @@ protected:
             else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && RAPIDJSON_UNLIKELY(escape[static_cast<unsigned char>(c)]))  {
                 is.Take();
                 PutUnsafe(*os_, '\\');
-                PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(escape[static_cast<unsigned char>(c)]));
+                PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(escape[static_cast<unsigned char>(c)]));
                 if (escape[static_cast<unsigned char>(c)] == 'u') {
                     PutUnsafe(*os_, '0');
                     PutUnsafe(*os_, '0');
@@ -458,6 +476,13 @@ protected:
             RAPIDJSON_ASSERT(!hasRoot_);    // Should only has one and only one root.
             hasRoot_ = true;
         }
+    }
+
+    // Flush the value if it is the top level one.
+    bool EndValue(bool ret) {
+        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
+            Flush();
+        return ret;
     }
 
     OutputStream* os_;

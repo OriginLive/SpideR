@@ -19,6 +19,7 @@ void Manager::FireCommand(std::string in)
 			std::string temp2;
 			std::getline(ss, temp2, ' ');
 			m_CommandList[temp](static_cast<void*>(&temp2));
+			Logger::instance().SetLog();
 		}
 		else
 		{
@@ -65,10 +66,10 @@ void Manager::ReadConfig() {
 		doc.Parse(s.c_str());
 
 		this->Config->textspeed = doc["textspeed"].GetInt();
-		this->Config->depth = doc["depth"].GetInt();
-		this->Config->debug = doc["debug"].GetInt();
-		this->Config->polite = doc["polite"].GetInt();
-		this->Config->show_http = doc["show_http"].GetInt();
+		this->Config->depth = !!doc["depth"].GetInt();
+		this->Config->debug = !!doc["debug"].GetInt();
+		this->Config->polite = !!doc["polite"].GetInt();
+		this->Config->show_http = !!doc["show_http"].GetInt();
 		auto it = this->Config->eMap.find(doc["type"].GetString());
 		if (it != this->Config->eMap.end())
 		{
@@ -102,6 +103,11 @@ void Manager::WriteToFile(const std::set<std::string>& data)
 	file.close();
 }
 
+void Manager::SetDisplay(std::shared_ptr<Console> console)
+{
+	m_display = console;
+}
+
 Manager::Manager()
 {
 }
@@ -117,4 +123,78 @@ Settings::Settings()
 	eMap.insert(std::pair<std::string, SortingType>("allsmall", allsmall));
 	eMap.insert(std::pair<std::string, SortingType>("firstcapital", firstcapital));
 	eMap.insert(std::pair<std::string, SortingType>("fullcapital", fullcapital));
+}
+
+
+
+
+/////////////////////////////////
+void Logger::operator<<(std::string in)
+{
+	if (Manager::instance().Config->debug == true)
+	{
+		m_Log(in);
+		Manager::instance().m_display->WriteCurrentEvent(in);
+	}
+
+}
+
+void Logger::Log(std::string in)
+{
+	if (Manager::instance().Config->debug == true)
+	{
+		m_Log(in);
+		Manager::instance().m_display->WriteCurrentEvent(in);
+	}
+}
+/////////////////////////////////
+
+void Logger::m_Log(std::string in)
+{
+	m_file.open(m_logname, std::ifstream::out);
+	if (m_file.is_open())
+	{
+		m_file << in << "\r\n";
+	}
+	else
+	{
+		std::cerr << "Error saving the file.";
+		char error[128];
+		std::cerr << strerror_s(error, 128, errno);
+	}
+}
+
+void Logger::SetLog()
+{
+	if (m_file.is_open())
+	{
+		m_file.close();
+	}
+	auto now = std::chrono::system_clock::now();
+	std::time_t start_time = std::chrono::system_clock::to_time_t(now);
+	std::stringstream tempstrs;
+	char timedisplay[256];
+	struct tm buf;
+	errno_t err = localtime_s(&buf, &start_time);
+	if (std::strftime(timedisplay, sizeof(timedisplay), "%F %H.%M.%S", &buf))
+	{
+		tempstrs << timedisplay;
+	}
+
+	m_logname = "Log " + tempstrs.str() + ".txt";
+
+}
+
+
+
+Logger::Logger()
+{
+}
+
+Logger::~Logger()
+{
+	if (m_file.is_open())
+	{
+		m_file.close();
+	}
 }
