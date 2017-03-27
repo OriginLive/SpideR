@@ -4,6 +4,7 @@
 
 void Manager::FireCommand(std::string in)
 {
+	m_working = true;
 	std::stringstream ss;
 	ss << in.data();
 	std::string temp;
@@ -27,6 +28,7 @@ void Manager::FireCommand(std::string in)
 		}
 	}
 	ss.clear();
+	m_working = false;
 }
 
 std::vector<std::string> Manager::ListCommands(const std::string & in) {
@@ -120,9 +122,9 @@ Manager::~Manager()
 Settings::Settings()
 {
 	eMap.insert(std::pair<std::string, SortingType>("unchanged", unchanged));
-	eMap.insert(std::pair<std::string, SortingType>("allsmall", allsmall));
-	eMap.insert(std::pair<std::string, SortingType>("firstcapital", firstcapital));
-	eMap.insert(std::pair<std::string, SortingType>("fullcapital", fullcapital));
+	eMap.insert(std::pair<std::string, SortingType>("lowercase", lowercase));
+	eMap.insert(std::pair<std::string, SortingType>("capitalize", capitalize));
+	eMap.insert(std::pair<std::string, SortingType>("uppercase", uppercase));
 }
 
 

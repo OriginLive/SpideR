@@ -8,6 +8,7 @@
 #include <utility>
 #include <pybind11/eval.h>
 #include <Python.h>
+#include <future>
 
 #include "Manager.h"
 #include "Queen.h"
@@ -39,6 +40,8 @@ int main()
 	Manager::instance().RegisterCommand("help", [&](void*) { display->State = std::make_unique<HelpState>(); });
 	Manager::instance().RegisterCommand("connect", [=](void* in) { Queen q( *(static_cast<std::string*>(in)) ); });
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
+
+	//std::async(std::launch::async, Manager::instance().);
 
 	while (IsRunning)
 	{

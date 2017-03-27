@@ -22,9 +22,10 @@
 #include <sstream>
 #include <chrono>
 #include <ctime>
+#include <atomic>
 
 
-enum SortingType {unchanged, allsmall, firstcapital, fullcapital};
+enum SortingType {unchanged, lowercase, capitalize, uppercase};
 
 class Settings
 {
@@ -108,9 +109,12 @@ public:
 
 
 	 std::shared_ptr<Console> m_display;
-   	 std::unique_ptr<Settings> Config;
+	 std::unique_ptr<Settings> Config;
 	 //template <typename T>
 	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
+	 std::atomic<bool> m_working = false;
+
+
 
 
 protected:

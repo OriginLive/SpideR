@@ -17,6 +17,7 @@ void Spider::crawl_list()
 {
 	while (!url_list.empty())
 	{
+		AmIStuck = std::chrono::high_resolution_clock::now();
 		auto target_url = url_list.back();
 		url_list.pop_back();
 		if (open_connection(target_url))

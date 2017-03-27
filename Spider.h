@@ -29,6 +29,7 @@ protected:
 	string_list* url_pool; // Pointer
 	string_set* data_pool;
 	bool gather_urls;
+	std::chrono::high_resolution_clock::time_point AmIStuck;
 };
 
 class Robot_Spider : public Spider

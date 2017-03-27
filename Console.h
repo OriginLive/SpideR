@@ -11,6 +11,7 @@ class IConsoleState
 public:
 	virtual std::string DisplayText() = 0;
 	virtual int InputLine() = 0;
+	virtual int ProgressLine() = 0;
 	virtual std::string Action() = 0;
 	IConsoleState();
 	virtual ~IConsoleState();
@@ -23,7 +24,8 @@ public:
 	~SplashState();
 	//std::string DisplayText();
 	std::string Action() { return ""; };
-	int InputLine() { return 7; };
+	int InputLine() { return 9; };
+	int ProgressLine() { return 7; };
 	std::string SplashState::DisplayText()
 	{
 
@@ -40,7 +42,8 @@ class HelpState : public IConsoleState
 public:
 	//std::string DisplayText();
 	std::string Action() { return ""; };
-	int InputLine() { return 7; };
+	int InputLine() { return 9; };
+	int ProgressLine() { return 7; };
 	std::string HelpState::DisplayText()
 	{
 
@@ -61,10 +64,11 @@ class Console
 public:
 	Console();
 	virtual ~Console();
-	virtual void Display() = 0;
+	virtual void Display(bool fast = false) = 0;
 	void WriteOut(std::string in);
 	void Input();
 	void WriteCurrentEvent(std::string in);
+	void ProgressStar();
 
 	std::unique_ptr<IConsoleState> State;
 
@@ -73,14 +77,14 @@ public:
 class WindowsConsole : public Console
 {
 public:
-	void Display();
+	void Display(bool fast = false);
 };
 
 class LinuxShell : public Console
 {
 public:
 	LinuxShell();
-	void Display();
+	void Display(bool fast = false);
 };
 
 
