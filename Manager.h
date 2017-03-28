@@ -49,7 +49,7 @@ public:
 class Logger
 {
 public:
-	void operator<<(std::string);
+	Logger& operator<<(std::string);
 	void Log(std::string);
 
 	static Logger &instance()

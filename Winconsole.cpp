@@ -168,6 +168,7 @@ void Console::ProgressStar()
 {
 	while (Manager::instance().m_working == true)
 	{
+		/*
 		auto timenow = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> diff = timenow-timenow;// FOR EACH SPIDER, AmIStuck
 		if (diff.count > 10)
@@ -177,7 +178,7 @@ void Console::ProgressStar()
 		else
 		{
 			//ROTATE STAR!
-		}
+		}*/
 	}
 }
 

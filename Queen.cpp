@@ -67,7 +67,7 @@ void Queen::check_url_pool()
 					std::cout << "Fetching robots.txt from " << host<< '\n';
 				}
 				read_robots_txt(*it);
-				urls_visited.insert(host +"/robots.txt");
+				urls_visited.insert(host +"/robots.txt"); // WHAT IF IT 503's TO ROBOTS.TXT 
 				
 			}
 		}

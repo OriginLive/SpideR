@@ -42,6 +42,7 @@ int main()
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
 
 	//std::async(std::launch::async, Manager::instance().);
+	Logger::instance() << "TestString";
 
 	while (IsRunning)
 	{

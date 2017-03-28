@@ -131,7 +131,7 @@ Settings::Settings()
 
 
 /////////////////////////////////
-void Logger::operator<<(std::string in)
+Logger& Logger::operator<<(std::string in)
 {
 	if (Manager::instance().Config->debug == true)
 	{
