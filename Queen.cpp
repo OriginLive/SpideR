@@ -17,7 +17,7 @@ void Queen::crawl()
 	{
 
 		//Logger::instance() << "Crawling depth: " << current_depth << " out of " << max_depth << '\n';
-		Logger::instance().Log("aa"); //TODO
+		Logger::log << "text"; //TODO
 		check_url_pool();
 		bool gather_urls = (current_depth < max_depth? true : false);
 		add_to_visited();

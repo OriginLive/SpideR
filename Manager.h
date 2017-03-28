@@ -46,34 +46,37 @@ public:
 // LOGGER
 //
 
-
-class Logger
+namespace Logger
 {
-public:
-	Logger& operator<<(std::string);
-	void Log(std::string);
-
-	static Logger &instance()
+	
+	class Logger
 	{
-		static Logger m_inst;
-		return m_inst;
-	}
+	public:
+		Logger& operator<<(std::string);
+		void Log(std::string);
 
-	void SetLog();
-private:
-	void m_Log(std::string);
-	std::string m_logname ="Log";
-	std::ofstream m_file;
+		static Logger &instance()
+		{
+			static Logger m_inst;
+			return m_inst;
+		}
 
-protected:
-	void operator=(Logger const&) = delete;
-	Logger(Logger const&) = delete;
+		void SetLog();
+	private:
+		void m_Log(std::string);
+		std::string m_logname = "Log";
+		std::ofstream m_file;
+
+	protected:
+		void operator=(Logger const&) = delete;
+		Logger(Logger const&) = delete;
 
 
-	Logger();
-	~Logger();
-};
-
+		Logger();
+		~Logger();
+	};
+	 Logger &log = Logger::instance();
+}
 
 
 

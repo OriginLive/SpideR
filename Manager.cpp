@@ -19,7 +19,7 @@ void Manager::FireCommand(std::string in)
 			std::string temp2;
 			std::getline(ss, temp2, ' ');
 			m_CommandList[temp](static_cast<void*>(&temp2));
-			Logger::instance().SetLog();
+			Logger::log.SetLog();
 		}
 		else
 		{
@@ -171,17 +171,17 @@ Settings::Settings()
 
 
 /////////////////////////////////
-Logger& Logger::operator<<(std::string in)
+Logger::Logger& Logger::Logger::operator<<(std::string in)
 {
 	if (Manager::instance().Config->debug == true)
 	{
 		m_Log(in);
 		Manager::instance().m_display->WriteCurrentEvent(in);
 	}
-
+	return *this;
 }
 
-void Logger::Log(std::string in)
+void Logger::Logger::Log(std::string in)
 {
 	if (Manager::instance().Config->debug == true)
 	{
@@ -191,7 +191,7 @@ void Logger::Log(std::string in)
 }
 /////////////////////////////////
 
-void Logger::m_Log(std::string in)
+void Logger::Logger::m_Log(std::string in)
 {
 	m_file.open(m_logname, std::ifstream::out);
 	if (m_file.is_open())
@@ -206,7 +206,7 @@ void Logger::m_Log(std::string in)
 	}
 }
 
-void Logger::SetLog()
+void Logger::Logger::SetLog()
 {
 	if (m_file.is_open())
 	{
@@ -229,11 +229,11 @@ void Logger::SetLog()
 
 
 
-Logger::Logger()
+Logger::Logger::Logger()
 {
 }
 
-Logger::~Logger()
+Logger::Logger::~Logger()
 {
 	if (m_file.is_open())
 	{

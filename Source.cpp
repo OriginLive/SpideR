@@ -45,6 +45,7 @@ int main()
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
 
 	std::thread t1([]() {Manager::instance().CheckProgress(); });
+	Logger::log << "string";
 
 	while (IsRunning)
 	{
