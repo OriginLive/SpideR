@@ -206,6 +206,8 @@ void Logger::Logger::m_Log(std::string in)
 	}
 }
 
+Logger::Logger &Logger::log = Logger::Logger::instance();
+
 void Logger::Logger::SetLog()
 {
 	if (m_file.is_open())

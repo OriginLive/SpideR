@@ -75,7 +75,7 @@ namespace Logger
 		Logger();
 		~Logger();
 	};
-	 Logger &log = Logger::instance();
+	extern Logger &log; // = Logger::instance();
 }
 
 
