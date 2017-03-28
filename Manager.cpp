@@ -114,6 +114,7 @@ void Manager::SetDisplay(std::shared_ptr<Console> console)
 void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARIABLE
 {
 	std::thread t1;
+	bool active = false;
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -123,6 +124,7 @@ void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARI
 			if (Manager::instance().m_display->progress.load() == false)
 			{
 				t1 = std::thread(std::bind(&Console::ProgressStar, Manager::instance().m_display)); //Spin the star
+				active = true;
 			}
 			
 			if (m_SpiderSet.size() != 0)
@@ -137,7 +139,12 @@ void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARI
 					}//More than 10s have passed, so it's stuck in a loop?
 				}
 		}
-		t1.join();
+		if (active)
+		{
+			t1.join();
+			active = false;
+		}
+		
 	}
 }
 
