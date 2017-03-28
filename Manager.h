@@ -10,7 +10,6 @@
 
 #include <map>
 #include <string>
-#include <map>
 #include <functional>
 #include <iostream>
 #include <fstream>
@@ -18,11 +17,13 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include "Console.h"
 #include <sstream>
 #include <chrono>
 #include <ctime>
 #include <atomic>
+#include <thread>
+#include <mutex>
+class Spider; // Forward decleration "Spider.h"
 
 
 enum SortingType {unchanged, lowercase, capitalize, uppercase};
@@ -106,15 +107,17 @@ public:
 	 void WriteToFile(const std::set<std::string>& data);
 	 void SetDisplay(std::shared_ptr<Console>);
 
+	 static void CheckProgress();
 
 
 	 std::shared_ptr<Console> m_display;
 	 std::unique_ptr<Settings> Config;
 	 //template <typename T>
 	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
+
 	 std::atomic<bool> m_working = false;
-
-
+	 static std::mutex m_MutexSpiderSet;
+	 static std::set<std::shared_ptr<Spider>> m_SpiderSet;
 
 
 protected:

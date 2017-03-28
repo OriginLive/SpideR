@@ -15,10 +15,15 @@ Spider::Spider()
 
 void Spider::crawl_list()
 {
+	std::mutex mutex;
 	while (!url_list.empty())
 	{
 		AmIStuck = std::chrono::high_resolution_clock::now();
 		auto target_url = url_list.back();
+		{
+		std::lock_guard<std::mutex> guard(mutex);
+		CurrentUrl = target_url;
+		}
 		url_list.pop_back();
 		if (open_connection(target_url))
 		{

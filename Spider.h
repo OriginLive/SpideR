@@ -17,6 +17,10 @@ typedef std::list<std::string> string_list;
 class Spider
 {
 	friend class Queen;
+	
+public:
+	std::chrono::high_resolution_clock::time_point AmIStuck;
+	std::string CurrentUrl = "";
 protected:
 	Spider(const string_deque& master_url_list, string_list* url_pool, string_set* data_pool, bool gather_urls);
 	Spider();
@@ -29,7 +33,7 @@ protected:
 	string_list* url_pool; // Pointer
 	string_set* data_pool;
 	bool gather_urls;
-	std::chrono::high_resolution_clock::time_point AmIStuck;
+	
 };
 
 class Robot_Spider : public Spider
