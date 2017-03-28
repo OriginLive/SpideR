@@ -3,6 +3,7 @@
 #define CONSOLE_H
 #include <string>
 #include <memory>
+#include <atomic>
 
 
 
@@ -71,6 +72,7 @@ public:
 	void ProgressStar();
 
 	std::unique_ptr<IConsoleState> State;
+	std::atomic<bool> progress;
 
 };
 

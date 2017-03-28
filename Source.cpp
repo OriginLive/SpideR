@@ -9,6 +9,7 @@
 #include <pybind11/eval.h>
 #include <Python.h>
 #include <future>
+#include <thread>
 
 #include "Manager.h"
 #include "Queen.h"
@@ -26,6 +27,8 @@ int main()
 	std::unique_ptr<LinuxFactory> factory = std::make_unique<LinuxFactory>();
 #endif
 
+	std::ofstream out("err.txt"); // Error output
+	std::cerr.rdbuf(out.rdbuf()); // Redirecting it to err.txt
 
 	//Py_Initialize();
 	//py::object scope = py::module::import("__main__").attr("__dict__");
@@ -41,7 +44,7 @@ int main()
 	Manager::instance().RegisterCommand("connect", [=](void* in) { Queen q( *(static_cast<std::string*>(in)) ); });
 	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
 
-	//std::async(std::launch::async, Manager::instance().);
+	std::thread t1([]() {Manager::instance().CheckProgress(); });
 
 	while (IsRunning)
 	{

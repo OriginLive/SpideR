@@ -1,6 +1,5 @@
 #include "Manager.h"
-
-
+#include "Spider.h"
 
 void Manager::FireCommand(std::string in)
 {
@@ -31,7 +30,8 @@ void Manager::FireCommand(std::string in)
 	m_working = false;
 }
 
-std::vector<std::string> Manager::ListCommands(const std::string & in) {
+std::vector<std::string> Manager::ListCommands(const std::string & in)
+{
 	std::vector<std::string> vec;
 	auto it = m_CommandList.lower_bound(in);
 	if (it == m_CommandList.end()) { return vec; }
@@ -51,7 +51,8 @@ std::vector<std::string> Manager::ListCommands(const std::string & in) {
 	return vec;
 }
 
-void Manager::ReadConfig() {
+void Manager::ReadConfig()
+{
 	Config = std::make_unique<Settings>();
 
 	std::ifstream file("Settings.json", std::ifstream::in);
@@ -109,6 +110,38 @@ void Manager::SetDisplay(std::shared_ptr<Console> console)
 {
 	m_display = console;
 }
+
+void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARIABLE
+{
+	std::thread t1;
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::seconds(1));
+		
+		if (Manager::instance().m_working == true)
+		{
+			if (Manager::instance().m_display->progress.load() == false)
+			{
+				t1 = std::thread(std::bind(&Console::ProgressStar, Manager::instance().m_display)); //Spin the star
+			}
+			
+			if (m_SpiderSet.size() != 0)
+				for (auto s : m_SpiderSet)
+				{
+					auto x = s->AmIStuck;
+					auto timenow = std::chrono::high_resolution_clock::now();
+					std::chrono::duration<double> diff = timenow - x;// FOR EACH SPIDER, AmIStuck?
+					if (diff.count() > 10)
+					{
+						std::cerr << &s << " Is taking " << std::chrono::duration_cast<std::chrono::seconds>(diff).count() << "s to check: " << s->CurrentUrl << std::endl;
+					}//More than 10s have passed, so it's stuck in a loop?
+				}
+		}
+		t1.join();
+	}
+}
+
+std::set<std::shared_ptr<Spider>> Manager::m_SpiderSet;
 
 Manager::Manager()
 {

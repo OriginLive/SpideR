@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Console.h"
 
 #include <iostream>
@@ -75,7 +75,10 @@ void Console::Input()	//this part could be improved!
 {
 	
 	input += _getch();
-	_putch(input.back());
+	if (!input.empty())
+	{
+		_putch(input.back());
+	}
 	if (!input.empty())
 	{
 
@@ -166,19 +169,32 @@ void Console::WriteCurrentEvent(std::string in)
 
 void Console::ProgressStar()
 {
-	while (Manager::instance().m_working == true)
+	progress = true;
+	static const char starsheet[] = { '\\','¦','/','-' }; //Display a \ | / star
+	int i = 1;
+	while (Manager::instance().m_working)
 	{
-		auto timenow = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> diff = timenow-timenow;// FOR EACH SPIDER, AmIStuck
-		if (diff.count > 10)
-		{
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
+		GetConsoleScreenBufferInfo(output, &csbi);
 
-		}//More than 10s have passed, so it's stuck in a loop?
-		else
-		{
-			//ROTATE STAR!
-		}
+
+		COORD pos = { 18+32, (SHORT)this->State->ProgressLine() };
+		SetConsoleCursorPosition(output, pos);
+		std::cout << (starsheet[i%4]);
+		SetConsoleTextAttribute(output, csbi.wAttributes);
+		if (i > 8)i = 1;
 	}
+	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
+	GetConsoleScreenBufferInfo(output, &csbi);
+
+
+	COORD pos = { 18 + 32, (SHORT)this->State->ProgressLine() };
+	SetConsoleCursorPosition(output, pos);
+	std::cout << "*";
+	SetConsoleTextAttribute(output, csbi.wAttributes);
+	progress = false;
 }
 
 IConsoleState::IConsoleState()
@@ -191,6 +207,7 @@ IConsoleState::~IConsoleState()
 
 Console::Console()
 {
+	progress = false;
 }
 
 Console::~Console()
