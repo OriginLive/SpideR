@@ -45,16 +45,6 @@ public:
 
 
 //
-// LOGGER
-//
-
-
-
-
-
-
-
-//
 // MANAGER
 //
 
@@ -103,6 +93,11 @@ protected:
 	Manager();
 	~Manager();
 };
+
+//
+// LOGGER
+//
+
 
 namespace Logger
 {
