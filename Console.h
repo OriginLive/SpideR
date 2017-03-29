@@ -27,7 +27,7 @@ public:
 	std::string Action() { return ""; };
 	int InputLine() { return 9; };
 	int ProgressLine() { return 7; };
-	std::string SplashState::DisplayText()
+	std::string DisplayText()
 	{
 
 	return  std::string("	SpideR, 1.0 (Freeware)\n") +
@@ -45,7 +45,7 @@ public:
 	std::string Action() { return ""; };
 	int InputLine() { return 9; };
 	int ProgressLine() { return 7; };
-	std::string HelpState::DisplayText()
+	std::string DisplayText()
 	{
 
 	return  std::string("	This is a sample help page.\n\n") +

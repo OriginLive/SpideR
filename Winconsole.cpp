@@ -49,12 +49,6 @@ void WindowsConsole::Display(bool fast)
 
 }
 
-void LinuxShell::Display(bool fast)
-{
-	std::cout << "Linux";
-}
-
-
 
 void Console::WriteOut(std::string in)
 {

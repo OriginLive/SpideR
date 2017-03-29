@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include "Console.h"
+#include <cstring>
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -47,71 +48,6 @@ public:
 // LOGGER
 //
 
-namespace Logger
-{
-	
-	class Logger
-	{
-	public:
-
-		template <typename T>
-		inline typename std::enable_if<!std::is_integral<T>::value,Logger&>::type operator<<(const T in)			//TODO make a temporary type, so that log << "text"; is different from log <<"some"<<"text";
-		{
-			if (Manager::instance().Config->debug == true)
-			{
-				std::string instring = (std::string)in;
-				m_InternalBuffer.append(instring);
-				try {
-					if (m_InternalBuffer.substr(m_InternalBuffer.size() - 1) == "\n")
-					{
-						m_Log(m_InternalBuffer);
-						Manager::instance().m_display->WriteCurrentEvent(m_InternalBuffer);
-						m_InternalBuffer.clear();
-					}
-				}
-				catch (std::out_of_range& e)
-				{
-					std::cerr << e.what();
-					//Do nuffin
-				}
-			}
-			return *this;
-		}
-		template <typename T>
-		inline typename std::enable_if<std::is_integral<T>::value, Logger&>::type operator<<(const T in)
-		{
-			Logger::operator<< (std::to_string(in));
-			return *this;
-		}
-		template <typename T>
-		inline void Log(T in)
-		{
-			Logger::operator<< in;
-		}
-
-		static Logger &instance()
-		{
-			static Logger m_inst;
-			return m_inst;
-		}
-
-		void SetLog();
-	private:
-		std::string m_InternalBuffer;
-		void m_Log(std::string);
-		std::string m_logname = "Log";
-		std::ofstream m_file;
-
-	protected:
-		void operator=(Logger const&) = delete;
-		Logger(Logger const&) = delete;
-
-
-		Logger();
-		~Logger();
-	};
-	extern Logger &log; // = Logger::instance();
-}
 
 
 
@@ -153,7 +89,7 @@ public:
 	 //template <typename T>
 	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
 
-	 std::atomic<bool> m_working = false;
+	 std::atomic<bool> m_working{false};
 	 static std::mutex m_MutexSpiderSet;
 	 static std::set<std::shared_ptr<Spider>> m_SpiderSet;
 
@@ -167,5 +103,71 @@ protected:
 	Manager();
 	~Manager();
 };
+
+namespace Logger
+{
+	
+	class Logger
+	{
+	public:
+
+		template <typename T>
+		inline typename std::enable_if<!std::is_integral<T>::value,Logger&>::type operator<<(const T in)			//TODO make a temporary type, so that log << "text"; is different from log <<"some"<<"text";
+		{
+			if (Manager::instance().Config->debug == true)
+			{
+				std::string instring = (std::string)in;
+				m_InternalBuffer.append(instring);
+				try {
+					if (m_InternalBuffer.substr(m_InternalBuffer.size() - 1) == "\n")
+					{
+						m_Log(m_InternalBuffer);
+						Manager::instance().m_display->WriteCurrentEvent(m_InternalBuffer);
+						m_InternalBuffer.clear();
+					}
+				}
+				catch (std::out_of_range& e)
+				{
+					std::cerr << e.what();
+					//Do nuffin
+				}
+			}
+			return *this;
+		}
+		template <typename T>
+		inline typename std::enable_if<std::is_integral<T>::value, Logger&>::type operator<<(const T in)
+		{
+			Logger::operator<< (std::to_string(in));
+			return *this;
+		}
+		template <typename T>
+		inline void Log(T in)
+		{
+			*this<< in;
+		}
+
+		static Logger &instance()
+		{
+			static Logger m_inst;
+			return m_inst;
+		}
+
+		void SetLog();
+	private:
+		std::string m_InternalBuffer;
+		void m_Log(std::string);
+		std::string m_logname = "Log";
+		std::ofstream m_file;
+
+	protected:
+		void operator=(Logger const&) = delete;
+		Logger(Logger const&) = delete;
+
+
+		Logger();
+		~Logger();
+	};
+	extern Logger &log; // = Logger::instance();
+}
 
 #endif // !MANAGER_H

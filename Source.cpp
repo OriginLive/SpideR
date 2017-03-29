@@ -14,7 +14,7 @@
 #include "Manager.h"
 #include "Queen.h"
 
-bool IsRunning = true;
+bool is_running = true;
 namespace py = pybind11;
 
 
@@ -42,12 +42,12 @@ int main()
 
 	Manager::instance().RegisterCommand("help", [&](void*) { display->State = std::make_unique<HelpState>(); });
 	Manager::instance().RegisterCommand("connect", [=](void* in) { Queen q( *(static_cast<std::string*>(in)) ); });
-	Manager::instance().RegisterCommand("quit", [&](void*) {IsRunning = false;}); 
+	Manager::instance().RegisterCommand("quit", [&](void*) {is_running = false;}); 
 
 	std::thread t1([]() {Manager::instance().CheckProgress(); });
 	
 
-	while (IsRunning)
+	while (is_running)
 	{
 		display->Input();
 	}

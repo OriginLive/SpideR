@@ -245,8 +245,7 @@ void Logger::Logger::m_Log(std::string in)
 	else
 	{
 		std::cerr << "Error saving the file.";
-		char error[128];
-		std::cerr << strerror_s(error, 128, errno);
+		std::cerr << strerror(errno);
 	}
 }
 
@@ -262,14 +261,13 @@ void Logger::Logger::SetLog()
 	std::time_t start_time = std::chrono::system_clock::to_time_t(now);
 	std::stringstream tempstrs;
 	char timedisplay[256];
-	struct tm buf;
-	errno_t err = localtime_s(&buf, &start_time);
-	if (std::strftime(timedisplay, sizeof(timedisplay), "%F %H.%M.%S", &buf))
+	auto tm = localtime(&start_time);
+	if (std::strftime(timedisplay, sizeof(timedisplay), "%F %H.%M.%S", tm))
 	{
 		tempstrs << timedisplay;
 	}
 
-	m_logname = "Log " + tempstrs.str() + ".txt";
+	m_logname = "Log_" + tempstrs.str() + ".txt";
 
 }
 
