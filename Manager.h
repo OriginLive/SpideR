@@ -23,6 +23,7 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include <type_traits>
 class Spider; // Forward decleration "Spider.h"
 
 
@@ -52,8 +53,41 @@ namespace Logger
 	class Logger
 	{
 	public:
-		Logger& operator<<(std::string);
-		void Log(std::string);
+
+		template <typename T>
+		inline typename std::enable_if<!std::is_integral<T>::value,Logger&>::type operator<<(const T in)			//TODO make a temporary type, so that log << "text"; is different from log <<"some"<<"text";
+		{
+			if (Manager::instance().Config->debug == true)
+			{
+				std::string instring = (std::string)in;
+				m_InternalBuffer.append(instring);
+				try {
+					if (instring.substr(instring.size() - 1) == "\n")
+					{
+						m_Log(m_InternalBuffer);
+						Manager::instance().m_display->WriteCurrentEvent(m_InternalBuffer);
+						m_InternalBuffer.clear();
+					}
+				}
+				catch (std::out_of_range& e)
+				{
+					std::cerr << e.what();
+					//Do nuffin
+				}
+			}
+			return *this;
+		}
+		template <typename T>
+		inline typename std::enable_if<std::is_integral<T>::value, Logger&>::type operator<<(const T in)
+		{
+			Logger::operator<< (std::to_string(in));
+			return *this;
+		}
+		template <typename T>
+		inline void Log(T in)
+		{
+			Logger::operator<< in;
+		}
 
 		static Logger &instance()
 		{
@@ -63,6 +97,7 @@ namespace Logger
 
 		void SetLog();
 	private:
+		std::string m_InternalBuffer;
 		void m_Log(std::string);
 		std::string m_logname = "Log";
 		std::ofstream m_file;

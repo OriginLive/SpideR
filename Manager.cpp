@@ -10,16 +10,17 @@ void Manager::FireCommand(std::string in)
 	std::getline(ss, temp, ' ');
 	if (m_CommandList.find(temp) == m_CommandList.end())
 	{
-		std::cout << "err"; //hmm  Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
+		std::cerr << "err, "<< temp<<" is not a valid command\n"; //hmm  Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 	}
 	else
 	{
 		if (temp == "connect") // ultra stupid, instead of looking for specific commands, perhaps a better use would be to have an Event class which held templated data, and an id with enum/guid.
 		{
+			Logger::log.SetLog();
 			std::string temp2;
 			std::getline(ss, temp2, ' ');
 			m_CommandList[temp](static_cast<void*>(&temp2));
-			Logger::log.SetLog();
+			
 		}
 		else
 		{
@@ -69,7 +70,7 @@ void Manager::ReadConfig()
 		doc.Parse(s.c_str());
 
 		this->Config->textspeed = doc["textspeed"].GetInt();
-		this->Config->depth = !!doc["depth"].GetInt();
+		this->Config->depth = doc["depth"].GetInt();
 		this->Config->debug = !!doc["debug"].GetInt();
 		this->Config->polite = !!doc["polite"].GetInt();
 		this->Config->show_http = !!doc["show_http"].GetInt();
@@ -81,19 +82,21 @@ void Manager::ReadConfig()
 		else
 		{
 			std::cerr << "Wrong type, available types are \"unchanged, allsmall, firstcapital, fullcapital\".";
+			Logger::log << "Wrong settings type error\n";
 		}
 
 	}
 	else
 	{
 		std::cerr << "Error opening settings file.";
+		Logger::log << "Error opening settings file.\n";
 	}
 	file.close();
 }
 
 void Manager::WriteToFile(const std::set<std::string>& data)
 {
-	std::cout << "Writing to file..\n";
+	Logger::log << "Writing to file..\n";
 	std::ofstream file("Output.txt", std::ifstream::out);
 	if (file.is_open())
 	{
@@ -102,6 +105,7 @@ void Manager::WriteToFile(const std::set<std::string>& data)
 	else
 	{
 		std::cerr << "Error saving the file.";
+		Logger::log << "Error saving the file.\n";
 	}
 	file.close();
 }
@@ -169,27 +173,63 @@ Settings::Settings()
 
 
 
-
+/* Inlined code
 /////////////////////////////////
-Logger::Logger& Logger::Logger::operator<<(std::string in)
+template <typename T>
+Logger::Logger& Logger::Logger::operator<<(T in)
 {
-	if (Manager::instance().Config->debug == true)
+	std::string instring = "";
+	try
 	{
-		m_Log(in);
-		Manager::instance().m_display->WriteCurrentEvent(in);
+		instring = (std::string)in;
+	}
+	catch (std::bad_cast &bc)
+	{
+		//Do nuffin
+	}
+	m_InternalBuffer.append(instring);
+	if (instring.size() >= 2)
+	{
+		if (instring.substr(instring.size() - 2) == "\n")
+		{
+			if (Manager::instance().Config->debug == true)
+			{
+				m_Log(m_InternalBuffer);
+				Manager::instance().m_display->WriteCurrentEvent(in);
+				m_InternalBuffer.clear();
+			}
+		}
 	}
 	return *this;
 }
-
-void Logger::Logger::Log(std::string in)
+template <typename T>
+void Logger::Logger::Log(T in)
 {
-	if (Manager::instance().Config->debug == true)
+	std::string instring = "";
+	try
 	{
-		m_Log(in);
-		Manager::instance().m_display->WriteCurrentEvent(in);
+		instring = (std::string)in;
+	}
+	catch (std::bad_cast &bc)
+	{
+		//Do nuffin
+	}
+	m_InternalBuffer.append(instring);
+	if (instring.size() >= 2)
+	{
+		if (instring.substr(instring.size() - 2) == "\n")
+		{
+			if (Manager::instance().Config->debug == true)
+			{
+				m_Log(m_InternalBuffer);
+				Manager::instance().m_display->WriteCurrentEvent(in);
+				m_InternalBuffer.clear();
+			}
+		}
 	}
 }
 /////////////////////////////////
+*/
 
 void Logger::Logger::m_Log(std::string in)
 {

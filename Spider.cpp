@@ -29,7 +29,7 @@ void Spider::crawl_list()
 		{
 			if (Manager::instance().Config->debug)
 			{
-				std::cout << "Fetched stream from: " << target_url << '\n';
+				Logger::log << "Fetched stream from: " << target_url << '\n';
 			}
 			parse_stream(target_url);
 		}

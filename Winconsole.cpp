@@ -43,7 +43,7 @@ void WindowsConsole::Display(bool fast)
 	else
 	{
 		WriteOut(State->DisplayText());
-		WriteOut("\n\tProgress:	\t\t\t\t*\n"); //8th line
+		std::cout << "\n\tProgress:	" << LastEvent << "*\n"; //8th line
 		WriteOut("\n\tInput your command: "); //10th line
 	}
 
@@ -166,9 +166,9 @@ void Console::WriteCurrentEvent(std::string in)
 	SetConsoleCursorPosition(output, pos);
 	std::cout << "\t\t\t\t";
 	SetConsoleCursorPosition(output, pos);
-	if (in.size() > 25)
+	if (in.size() > 35)
 	{
-		in = in.substr(0, 23) + "...";
+		in = in.substr(0, 32) + "...";
 	}
 	std::cout << (in);
 	SetConsoleCursorPosition(output, csbi.dwCursorPosition);
