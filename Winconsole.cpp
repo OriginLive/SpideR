@@ -164,11 +164,11 @@ void Console::WriteCurrentEvent(std::string in)
 
 	COORD pos = { 18, (SHORT)this->State->ProgressLine() };
 	SetConsoleCursorPosition(output, pos);
-	std::cout << "\t\t\t\t";
+	std::cout << "\t\t\t\t\t\t";
 	SetConsoleCursorPosition(output, pos);
-	if (in.size() > 35)
+	if (in.size() > 58)
 	{
-		in = in.substr(0, 32) + "...";
+		in = in.substr(0, 55) + "...";
 	}
 	std::cout << (in);
 	SetConsoleCursorPosition(output, csbi.dwCursorPosition);
@@ -186,7 +186,7 @@ void Console::ProgressStar()
 		GetConsoleScreenBufferInfo(output, &csbi);
 
 
-		COORD pos = { 18+38, (SHORT)this->State->ProgressLine() };
+		COORD pos = { 18+38+24, (SHORT)this->State->ProgressLine() };
 		SetConsoleCursorPosition(output, pos);
 		std::cout << (starsheet[i%4]);
 		SetConsoleCursorPosition(output, csbi.dwCursorPosition);
@@ -199,7 +199,7 @@ void Console::ProgressStar()
 	GetConsoleScreenBufferInfo(output, &csbi);
 
 
-	COORD pos = { 18 + 38, (SHORT)this->State->ProgressLine() };
+	COORD pos = { 18 + 38+24, (SHORT)this->State->ProgressLine() };
 	SetConsoleCursorPosition(output, pos);
 	std::cout << "*";
 	SetConsoleCursorPosition(output, csbi.dwCursorPosition);

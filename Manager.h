@@ -62,7 +62,7 @@ namespace Logger
 				std::string instring = (std::string)in;
 				m_InternalBuffer.append(instring);
 				try {
-					if (instring.substr(instring.size() - 1) == "\n")
+					if (m_InternalBuffer.substr(m_InternalBuffer.size() - 1) == "\n")
 					{
 						m_Log(m_InternalBuffer);
 						Manager::instance().m_display->WriteCurrentEvent(m_InternalBuffer);

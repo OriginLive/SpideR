@@ -233,10 +233,14 @@ void Logger::Logger::Log(T in)
 
 void Logger::Logger::m_Log(std::string in)
 {
-	m_file.open(m_logname, std::ifstream::out);
+	if (!m_file.is_open())
+	{
+		m_file.open(m_logname);
+	}
 	if (m_file.is_open())
 	{
-		m_file << in << "\r\n";
+		m_file << in;
+		m_file.flush();
 	}
 	else
 	{

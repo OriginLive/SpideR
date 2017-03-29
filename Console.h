@@ -66,14 +66,14 @@ public:
 	Console();
 	virtual ~Console();
 	virtual void Display(bool fast = false) = 0;
-	void WriteOut(std::string in);
+	virtual void WriteOut(std::string in);
 	void Input();
 	void WriteCurrentEvent(std::string in);
 	void ProgressStar();
 
 	std::unique_ptr<IConsoleState> State;
 	std::atomic<bool> progress;
-	std::string LastEvent = "\t\t\t\t";
+	std::string LastEvent = "\t\t\t\t\t\t\t";
 
 };
 
