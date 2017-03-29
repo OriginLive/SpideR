@@ -1,6 +1,7 @@
 #pragma once
 #ifndef MANAGER_H
 #define MANAGER_H
+#define _CRT_SECURE_NO_WARNINGS
 
 #ifdef _WIN32
 #include "rapidjson\document.h"

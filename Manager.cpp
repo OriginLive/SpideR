@@ -262,7 +262,7 @@ void Logger::Logger::SetLog()
 	std::stringstream tempstrs;
 	char timedisplay[256];
 	auto tm = localtime(&start_time);
-	if (std::strftime(timedisplay, sizeof(timedisplay), "%F%H.%M.%S", tm))
+	if (std::strftime(timedisplay, sizeof(timedisplay), "%F_%H.%M.%S", tm))
 	{
 		tempstrs << timedisplay;
 	}
