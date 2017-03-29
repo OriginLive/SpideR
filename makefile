@@ -3,7 +3,7 @@ MAKE_DIR := $(PWD)
 LIB_DIR := ${MAKE_DIR}/libs
 LIB_SRCH_PATH := -L${LIB_DIR}
 
-LIBS := -lcurl -lcurlpp -lgumbo 
+LIBS := -lcurl -lcurlpp -lgumbo -lpthread
 
 INCLUDE_PATH :=
 INCLUDE_PATH += -I${LIB_DIR}

@@ -10,32 +10,12 @@
 #include "Manager.h"
 
 
-const std::string SplashText
-{
-"	SpideR, 1.0 (Freeware)\n"
-"	Made with care, 2016 by Origin\n"
-"	(SpideR) Web spider crawler made to gather words and sort them\n"
-"	Its modular design (will) allow it to include AI to learn and comprehend sentences\n\n"
-"	Type \"help\" for a list of commands\n"
-};
-
-const std::string HelpText
-{
-
-"	Commands:\n"
-"	\"help\" - This screen.\n"
-"	\"connect website\" - Connect to given website and crawl it based on settings.\n"
-"	\"quit\" - Exit program.\n"
-"	\n"
-};
-
-
 LinuxShell::LinuxShell()
 {
 	State = std::make_unique<SplashState>();
 }
 
-void LinuxShell::Display()
+void LinuxShell::Display(bool fast)
 {
 	std::cout << "Linux";
 }
@@ -56,17 +36,15 @@ void Console::Input()	//this part could be improved!
 	Manager::instance().FireCommand(input);
 }
 
-
-
-std::string SplashState::DisplayText()
+void Console::WriteCurrentEvent(std::string in)
 {
-	return SplashText;
 }
 
-std::string HelpState::DisplayText()
+void Console::ProgressStar()
 {
-	return HelpText;
 }
+
+
 
 Console::Console()
 {

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include "Console.h"
+#include <cstring>
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -44,8 +45,59 @@ public:
 
 
 //
+// MANAGER
+//
+
+
+class Manager
+{
+public:
+
+
+	static Manager &instance()
+	{
+		static Manager m_inst;
+		return m_inst;
+	}
+
+	void RegisterCommand(std::string in, std::function<void(void*)> lambda)
+	{
+		m_CommandList[in] = lambda;
+	};
+
+	 void FireCommand(std::string in);
+	 std::vector<std::string> ListCommands(const std::string &in);
+	 void ReadConfig();
+	 void WriteToFile(const std::set<std::string>& data);
+	 void SetDisplay(std::shared_ptr<Console>);
+
+	 static void CheckProgress();
+
+
+	 std::shared_ptr<Console> m_display;
+	 std::unique_ptr<Settings> Config;
+	 //template <typename T>
+	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
+
+	 std::atomic<bool> m_working{false};
+	 static std::mutex m_MutexSpiderSet;
+	 static std::set<std::shared_ptr<Spider>> m_SpiderSet;
+
+
+protected:
+	
+	void operator=(Manager const&) = delete;
+	Manager(Manager const&) = delete;
+
+
+	Manager();
+	~Manager();
+};
+
+//
 // LOGGER
 //
+
 
 namespace Logger
 {
@@ -86,7 +138,7 @@ namespace Logger
 		template <typename T>
 		inline void Log(T in)
 		{
-			Logger::operator<< in;
+			*this<< in;
 		}
 
 		static Logger &instance()
@@ -112,60 +164,5 @@ namespace Logger
 	};
 	extern Logger &log; // = Logger::instance();
 }
-
-
-
-
-
-
-//
-// MANAGER
-//
-
-
-class Manager
-{
-public:
-
-
-	static Manager &instance()
-	{
-		static Manager m_inst;
-		return m_inst;
-	}
-
-	void RegisterCommand(std::string in, std::function<void(void*)> lambda)
-	{
-		m_CommandList[in] = lambda;
-	};
-
-	 void FireCommand(std::string in);
-	 std::vector<std::string> ListCommands(const std::string &in);
-	 void ReadConfig();
-	 void WriteToFile(const std::set<std::string>& data);
-	 void SetDisplay(std::shared_ptr<Console>);
-
-	 static void CheckProgress();
-
-
-	 std::shared_ptr<Console> m_display;
-	 std::unique_ptr<Settings> Config;
-	 //template <typename T>
-	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
-
-	 std::atomic<bool> m_working = false;
-	 static std::mutex m_MutexSpiderSet;
-	 static std::set<std::shared_ptr<Spider>> m_SpiderSet;
-
-
-protected:
-	
-	void operator=(Manager const&) = delete;
-	Manager(Manager const&) = delete;
-
-
-	Manager();
-	~Manager();
-};
 
 #endif // !MANAGER_H
