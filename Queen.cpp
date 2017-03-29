@@ -16,8 +16,7 @@ void Queen::crawl()
 	while (current_depth++ <= max_depth && !(url_pool.empty()))
 	{
 
-		//Logger::instance() << "Crawling depth: " << current_depth << " out of " << max_depth << '\n';
-		Logger::log << "text"; //TODO
+		Logger::log << "Crawling depth: " << current_depth << " out of " << max_depth << '\n';
 		check_url_pool();
 		bool gather_urls = (current_depth < max_depth? true : false);
 		add_to_visited();

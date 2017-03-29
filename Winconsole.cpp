@@ -36,7 +36,7 @@ void WindowsConsole::Display(bool fast)
 	{
 		system("cls");
 		std::cout << State->DisplayText();
-		std::cout << "\n\tProgress:	\t\t\t\t*\n"; //8th line
+		std::cout << "\n\tProgress:	"<< LastEvent << "*\n"; //8th line
 		std::cout << "\n\tInput your command: "; //10th line
 		std::cout << input;
 	}
@@ -156,6 +156,7 @@ void Console::Input()	//this part could be improved!
 
 void Console::WriteCurrentEvent(std::string in)
 {
+	LastEvent = in;
 	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
 	GetConsoleScreenBufferInfo(output, &csbi);
@@ -163,14 +164,20 @@ void Console::WriteCurrentEvent(std::string in)
 
 	COORD pos = { 18, (SHORT)this->State->ProgressLine() };
 	SetConsoleCursorPosition(output, pos);
-	std::cout<<(in);
-	SetConsoleTextAttribute(output, csbi.wAttributes);
+	std::cout << "\t\t\t\t";
+	SetConsoleCursorPosition(output, pos);
+	if (in.size() > 25)
+	{
+		in = in.substr(0, 23) + "...";
+	}
+	std::cout << (in);
+	SetConsoleCursorPosition(output, csbi.dwCursorPosition);
 }
 
 void Console::ProgressStar()
 {
 	progress = true;
-	static const char starsheet[] = { '\\','¦','/','-' }; //Display a \ | / star
+	static const char starsheet[] = { '\\','|','/','-' }; //Display a \ | / star
 	int i = 1;
 	while (Manager::instance().m_working)
 	{
@@ -179,21 +186,23 @@ void Console::ProgressStar()
 		GetConsoleScreenBufferInfo(output, &csbi);
 
 
-		COORD pos = { 18+32, (SHORT)this->State->ProgressLine() };
+		COORD pos = { 18+38, (SHORT)this->State->ProgressLine() };
 		SetConsoleCursorPosition(output, pos);
 		std::cout << (starsheet[i%4]);
-		SetConsoleTextAttribute(output, csbi.wAttributes);
+		SetConsoleCursorPosition(output, csbi.dwCursorPosition);
+		i++;
 		if (i > 8)i = 1;
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
 	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
 	GetConsoleScreenBufferInfo(output, &csbi);
 
 
-	COORD pos = { 18 + 32, (SHORT)this->State->ProgressLine() };
+	COORD pos = { 18 + 38, (SHORT)this->State->ProgressLine() };
 	SetConsoleCursorPosition(output, pos);
 	std::cout << "*";
-	SetConsoleTextAttribute(output, csbi.wAttributes);
+	SetConsoleCursorPosition(output, csbi.dwCursorPosition);
 	progress = false;
 }
 

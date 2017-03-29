@@ -73,6 +73,7 @@ public:
 
 	std::unique_ptr<IConsoleState> State;
 	std::atomic<bool> progress;
+	std::string LastEvent = "\t\t\t\t";
 
 };
 
