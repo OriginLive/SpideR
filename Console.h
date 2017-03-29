@@ -33,7 +33,7 @@ public:
 	return  std::string("	SpideR, 1.0 (Freeware)\n") +
 			std::string("	Made with care, 2016 by Origin with a lot of contrubiton by Tor\n") +
 			std::string("	(SpideR) Web spider crawler made to gather words and sort them\n") +
-			std::string("	It's modular design allows it to include AI to lean and comprehend sentences\n\n") +
+			std::string("	Its modular design allows it to include AI to learn and comprehend sentences\n\n") +
 			std::string("	Type \"help\" for a list of commands\n");
 	}
 };
