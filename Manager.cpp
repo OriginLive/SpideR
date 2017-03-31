@@ -225,6 +225,7 @@ void Logger::Logger::m_Log(std::string in)
 	}
 }
 
+//Logger::Logger::operator internal::Liner() const { return {}; }
 Logger::Logger &Logger::log = Logger::Logger::instance();
 
 void Logger::Logger::SetLog()
