@@ -11,11 +11,11 @@ Connection::Connection(const std::string& other_url, std::stringstream& stream)
 	}
 	catch (cURLpp::RuntimeError& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << e.what() << " at " << url << '\n';
 	}
 	catch (cURLpp::LogicError& e)
 	{
-		std::cerr << e.what() << '\n';
+		std::cerr << e.what() << " at " << url << '\n';
 	}
 }
 

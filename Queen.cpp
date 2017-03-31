@@ -16,7 +16,7 @@ void Queen::crawl()
 	while (current_depth++ <= max_depth && !(url_pool.empty()))
 	{
 
-		Logger::log << "Crawling depth: " << current_depth << " out of " << max_depth << "\n";
+		Logger::log << "Crawling depth: " << current_depth << " out of " << max_depth;
 		check_url_pool();
 		bool gather_urls = (current_depth < max_depth? true : false);
 		add_to_visited();
@@ -53,7 +53,7 @@ void Queen::check_url_pool()
 					it = url_pool.erase(it);
 					if (Manager::instance().Config->debug)
 					{
-						Logger::log << "Host: " << host << " Path: " << path << " found in exclusion list. Skipping...\n";
+						Logger::log << "Host: " << host << " Path: " << path << " found in exclusion list. Skipping...";
 					}
 					break;
 				}
@@ -62,7 +62,7 @@ void Queen::check_url_pool()
 			{
 				if (Manager::instance().Config->debug)
 				{
-					Logger::log << "Fetching robots.txt from " << host<< "\n";
+					Logger::log << "Fetching robots.txt from " << host;
 				}
 				read_robots_txt(*it);
 				urls_visited.insert(host +"/robots.txt"); // WHAT IF IT 503's TO ROBOTS.TXT 

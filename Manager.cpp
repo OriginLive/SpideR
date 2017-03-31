@@ -82,21 +82,21 @@ void Manager::ReadConfig()
 		else
 		{
 			std::cerr << "Wrong type, available types are \"unchanged, allsmall, firstcapital, fullcapital\".";
-			Logger::log << "Wrong settings type error\n";
+			Logger::log << "Wrong settings type error";
 		}
 
 	}
 	else
 	{
 		std::cerr << "Error opening settings file.";
-		Logger::log << "Error opening settings file.\n";
+		Logger::log << "Error opening settings file.";
 	}
 	file.close();
 }
 
 void Manager::WriteToFile(const std::set<std::string>& data)
 {
-	Logger::log << "Writing to file..\n";
+	Logger::log << "Writing to file..";
 	std::ofstream file("Output.txt", std::ifstream::out);
 	if (file.is_open())
 	{
@@ -105,7 +105,7 @@ void Manager::WriteToFile(const std::set<std::string>& data)
 	else
 	{
 		std::cerr << "Error saving the file.";
-		Logger::log << "Error saving the file.\n";
+		Logger::log << "Error saving the file.";
 	}
 	file.close();
 }
