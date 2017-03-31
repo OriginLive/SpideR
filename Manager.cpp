@@ -96,8 +96,8 @@ void Manager::ReadConfig()
 
 void Manager::WriteToFile(const std::set<std::string>& data)
 {
-	Logger::log << "Writing to file..\n";
-	std::ofstream file("Output.txt", std::ifstream::out);
+	Logger::log << "Writing to file... \n";
+	std::ofstream file("Output.txt");
 	if (file.is_open())
 	{
 		std::copy(data.begin(), data.end(), std::ostream_iterator<std::string>(file, "\n"));

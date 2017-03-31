@@ -7,7 +7,7 @@ Queen::Queen(std::string url):
 	url_pool.push_back(url);
 	crawl();
 	save_data();
-	Logger::log << "Finished!";
+	Logger::log << "Finished!\n";
 	}
 
 

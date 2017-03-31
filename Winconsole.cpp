@@ -163,7 +163,7 @@ void Console::Input()	//this part could be improved!
 
 		COORD pos = { 18, (SHORT)this->State->ProgressLine() };
 		SetConsoleCursorPosition(output, pos);
-		std::cout << "\t\t\t\t\t\t";
+		std::cout << "\t\t\t\t\t\t\t";
 		SetConsoleCursorPosition(output, pos);
 		if (in.size() > 58)
 		{
