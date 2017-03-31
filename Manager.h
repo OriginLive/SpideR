@@ -28,8 +28,7 @@
 #include <type_traits>
 class Spider; // Forward decleration "Spider.h"
 
-
-enum SortingType {unchanged, lowercase, capitalize, uppercase};
+enum SortingType { unchanged, lowercase, capitalize, uppercase };
 
 class Settings
 {
@@ -66,27 +65,27 @@ public:
 		m_CommandList[in] = lambda;
 	};
 
-	 void FireCommand(std::string in);
-	 std::vector<std::string> ListCommands(const std::string &in);
-	 void ReadConfig();
-	 void WriteToFile(const std::set<std::string>& data);
-	 void SetDisplay(std::shared_ptr<Console>);
+	void FireCommand(std::string in);
+	std::vector<std::string> ListCommands(const std::string &in);
+	void ReadConfig();
+	void WriteToFile(const std::set<std::string>& data);
+	void SetDisplay(std::shared_ptr<Console>);
 
-	 static void CheckProgress();
+	static void CheckProgress();
 
 
-	 std::shared_ptr<Console> m_display;
-	 std::unique_ptr<Settings> Config;
-	 //template <typename T>
-	 std::map<std::string, std::function<void(void*)>> m_CommandList{};
+	std::shared_ptr<Console> m_display;
+	std::unique_ptr<Settings> Config;
+	//template <typename T>
+	std::map<std::string, std::function<void(void*)>> m_CommandList{};
 
-	 std::atomic<bool> m_working{false};
-	 static std::mutex m_MutexSpiderSet;
-	 static std::set<std::shared_ptr<Spider>> m_SpiderSet;
+	std::atomic<bool> m_working{ false };
+	static std::mutex m_MutexSpiderSet;
+	static std::set<std::shared_ptr<Spider>> m_SpiderSet;
 
 
 protected:
-	
+
 	void operator=(Manager const&) = delete;
 	Manager(Manager const&) = delete;
 
@@ -102,47 +101,24 @@ protected:
 
 namespace Logger
 {
-	
+	namespace internal {
+		struct Liner;
+	}
+
 	class Logger
 	{
 	public:
+		friend internal::Liner;
 
-		template <typename T>
-		inline typename std::enable_if<!std::is_integral<T>::value,Logger&>::type operator<<(const T in)			//TODO make a temporary type, so that log << "text"; is different from log <<"some"<<"text";
-		{
-			if (Manager::instance().Config->debug == true)
-			{
-				std::string instring = (std::string)in;
-				m_InternalBuffer.append(instring);
-				try {
-					if (m_InternalBuffer.substr(m_InternalBuffer.size() - 1) == "\n")
-					{
-						m_Log(m_InternalBuffer);
-						Manager::instance().m_display->WriteCurrentEvent(m_InternalBuffer);
-						m_InternalBuffer.clear();
-					}
-				}
-				catch (std::out_of_range& e)
-				{
-					std::cerr << e.what();
-					//Do nuffin
-				}
-			}
-			return *this;
-		}
-		template <typename T>
-		inline typename std::enable_if<std::is_integral<T>::value, Logger&>::type operator<<(const T in)
-		{
-			Logger::operator<< (std::to_string(in));
-			return *this;
-		}
+		operator internal::Liner() const;
+
 		template <typename T>
 		inline void Log(T in)
 		{
-			*this<< in;
+			internal::Liner() << in;
 		}
 
-		static Logger &instance()
+		static Logger& instance()
 		{
 			static Logger m_inst;
 			return m_inst;
@@ -150,9 +126,8 @@ namespace Logger
 
 		void SetLog();
 	private:
-		std::string m_InternalBuffer;
 		void m_Log(std::string);
-		std::string m_logname = "Log";
+		std::string m_logname = "Log.txt";
 		std::ofstream m_file;
 
 	protected:
@@ -163,7 +138,36 @@ namespace Logger
 		Logger();
 		~Logger();
 	};
+	namespace internal
+	{
+		struct Liner {
+			friend class Logger;
+			bool Owned = true;
+			Liner() = default;
+			Liner(Liner &&O) : p_s_{ std::move(O.p_s_) } { O.Owned = false; } //Not actually used 0o
+			~Liner()
+			{
+				if (Owned)
+				{
+					*p_s_ << std::endl;
+					Logger::instance().m_Log(p_s_->str());
+					Manager::instance().m_display->WriteCurrentEvent(p_s_->str());
+				}
+			}
+
+			std::unique_ptr<std::stringstream> p_s_{ new std::stringstream() };
+		};
+
+		template <typename T>
+		const Liner &operator<<(const Liner &L, T &&E) {
+			*L.p_s_ << std::forward<T>(E);
+			return L;
+		}
+	}
+	inline Logger::operator internal::Liner() const { return {}; }
 	extern Logger &log; // = Logger::instance();
 }
+using Logger::internal::operator<<;
+
 
 #endif // !MANAGER_H
