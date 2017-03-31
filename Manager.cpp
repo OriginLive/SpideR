@@ -10,7 +10,7 @@ void Manager::FireCommand(std::string in)
 	std::getline(ss, temp, ' ');
 	if (m_CommandList.find(temp) == m_CommandList.end())
 	{
-		std::cerr << "err, "<< temp<<" is not a valid command\n"; //hmm  Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
+		std::cerr << "err, " << temp << " is not a valid command\n"; //hmm  Manager::instance().RegisterCommand("err", [=](std::string err) { display->WriteOut(err); });
 	}
 	else
 	{
@@ -20,7 +20,7 @@ void Manager::FireCommand(std::string in)
 			std::string temp2;
 			std::getline(ss, temp2, ' ');
 			m_CommandList[temp](static_cast<void*>(&temp2));
-			
+
 		}
 		else
 		{
@@ -122,7 +122,7 @@ void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARI
 	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		
+
 		if (Manager::instance().m_working == true)
 		{
 			if (Manager::instance().m_display->progress.load() == false)
@@ -130,7 +130,7 @@ void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARI
 				t1 = std::thread(std::bind(&Console::ProgressStar, Manager::instance().m_display)); //Spin the star
 				active = true;
 			}
-			
+
 			if (m_SpiderSet.size() != 0)
 				for (auto s : m_SpiderSet)
 				{
@@ -148,7 +148,7 @@ void Manager::CheckProgress() // POOLING SUCKS, THINK OBSERVER OR CONDITION_VARI
 			t1.join();
 			active = false;
 		}
-		
+
 	}
 }
 
@@ -176,57 +176,33 @@ Settings::Settings()
 /* Inlined code
 /////////////////////////////////
 template <typename T>
-Logger::Logger& Logger::Logger::operator<<(T in)
+inline typename std::enable_if<!std::is_integral<T>::value, Logger&>::type operator<<(const T in)
 {
-	std::string instring = "";
-	try
+	if (Manager::instance().Config->debug == true)
 	{
-		instring = (std::string)in;
-	}
-	catch (std::bad_cast &bc)
-	{
-		//Do nuffin
-	}
-	m_InternalBuffer.append(instring);
-	if (instring.size() >= 2)
-	{
-		if (instring.substr(instring.size() - 2) == "\n")
-		{
-			if (Manager::instance().Config->debug == true)
+		std::string instring = (std::string)in;
+		m_InternalBuffer.append(instring);
+		try {
+			if (m_InternalBuffer.substr(m_InternalBuffer.size() - 1) == "\n")
 			{
 				m_Log(m_InternalBuffer);
-				Manager::instance().m_display->WriteCurrentEvent(in);
+				Manager::instance().m_display->WriteCurrentEvent(m_InternalBuffer);
 				m_InternalBuffer.clear();
 			}
+		}
+		catch (std::out_of_range& e)
+		{
+			std::cerr << e.what();
+			//Do nuffin
 		}
 	}
 	return *this;
 }
 template <typename T>
-void Logger::Logger::Log(T in)
+inline typename std::enable_if<std::is_integral<T>::value, Logger&>::type operator<<(const T in)
 {
-	std::string instring = "";
-	try
-	{
-		instring = (std::string)in;
-	}
-	catch (std::bad_cast &bc)
-	{
-		//Do nuffin
-	}
-	m_InternalBuffer.append(instring);
-	if (instring.size() >= 2)
-	{
-		if (instring.substr(instring.size() - 2) == "\n")
-		{
-			if (Manager::instance().Config->debug == true)
-			{
-				m_Log(m_InternalBuffer);
-				Manager::instance().m_display->WriteCurrentEvent(in);
-				m_InternalBuffer.clear();
-			}
-		}
-	}
+	Logger::operator<< (std::to_string(in));
+	return *this;
 }
 /////////////////////////////////
 */
