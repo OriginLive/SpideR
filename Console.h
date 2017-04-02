@@ -68,8 +68,15 @@ public:
 	virtual void Display(bool fast = false) = 0;
 	virtual void WriteOut(std::string in);
 	void Input();
+#ifdef _WIN32
 	void WriteCurrentEvent(std::string in);
 	void ProgressStar();
+#elif defined __linux__
+	void WriteCurrentEvent(std::string in) { std::cout << in };
+	void ProgressStar() {};
+#endif
+	
+	
 
 	std::unique_ptr<IConsoleState> State;
 	std::atomic<bool> progress;
