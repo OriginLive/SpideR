@@ -36,7 +36,11 @@ void WindowsConsole::Display(bool fast)
 	{
 		system("cls");
 		std::cout << State->DisplayText();
-		std::cout << "\n\tProgress:	" << LastEvent << "*\n"; //8th line
+		std::cout << "\n\tProgress:	" << LastEvent;
+		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+		COORD pos = { 18 + 38 + 24, (SHORT)this->State->ProgressLine() };
+		SetConsoleCursorPosition(output, pos);
+		std::cout << "*\n"; //8th line
 		std::cout << "\n\tInput your command: "; //10th line
 		std::cout << input;
 	}
@@ -79,9 +83,13 @@ void Console::Input()	//this part could be improved!
 		if (input.back() == '\r')
 		{
 			input.pop_back();
+			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
+			COORD pos = { 28 + (SHORT)input.length() ,(SHORT)this->State->InputLine() };      // GO BACK TO INPUT
+			SetConsoleCursorPosition(output, pos);
 			//input = input.substr(0, input.length() - 2);
 			Manager::instance().FireCommand(input);
 			input.clear();
+			this->Display(true);
 		}
 	}
 	if (!input.empty())
@@ -155,6 +163,12 @@ void Console::Input()	//this part could be improved!
 
 	void Console::WriteCurrentEvent(std::string in)
 	{
+		if (in.size() >= 2)
+		{
+			in.erase(in.size() - 1, 2);
+		}
+		while (writemutex) {};
+		writemutex = true;
 		LastEvent = in;
 		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
@@ -163,7 +177,7 @@ void Console::Input()	//this part could be improved!
 
 		COORD pos = { 18, (SHORT)this->State->ProgressLine() };
 		SetConsoleCursorPosition(output, pos);
-		std::cout << "\t\t\t\t\t\t\t";
+		std::cout << "                                                              ";
 		SetConsoleCursorPosition(output, pos);
 		if (in.size() > 58)
 		{
@@ -171,6 +185,7 @@ void Console::Input()	//this part could be improved!
 		}
 		std::cout << (in);
 		SetConsoleCursorPosition(output, csbi.dwCursorPosition);
+		writemutex = false;
 	}
 
 	void Console::ProgressStar()
@@ -180,6 +195,8 @@ void Console::Input()	//this part could be improved!
 		int i = 1;
 		while (Manager::instance().m_working)
 		{
+			while (writemutex) {};
+			writemutex = true;
 			HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 			CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
 			GetConsoleScreenBufferInfo(output, &csbi);
@@ -191,8 +208,11 @@ void Console::Input()	//this part could be improved!
 			SetConsoleCursorPosition(output, csbi.dwCursorPosition);
 			i++;
 			if (i > 8)i = 1;
+			writemutex = false;
 			std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		}
+		while (writemutex) {};
+		writemutex = true;
 		HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
 		CONSOLE_SCREEN_BUFFER_INFO csbi; // CURRENT CONSOLE INFO
 		GetConsoleScreenBufferInfo(output, &csbi);
@@ -203,6 +223,7 @@ void Console::Input()	//this part could be improved!
 		std::cout << "*";
 		SetConsoleCursorPosition(output, csbi.dwCursorPosition);
 		progress = false;
+		writemutex = false;
 	}
 
 	IConsoleState::IConsoleState()
@@ -215,6 +236,7 @@ void Console::Input()	//this part could be improved!
 
 	Console::Console()
 	{
+		writemutex = false;
 		progress = false;
 	}
 

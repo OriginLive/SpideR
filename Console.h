@@ -73,13 +73,14 @@ public:
 	void ProgressStar();
 #elif defined __linux__
 	void WriteCurrentEvent(std::string in) { std::cout << in };
-	void ProgressStar() {};
+	void ProgressStar(){};
 #endif
 	
 	
 
 	std::unique_ptr<IConsoleState> State;
 	std::atomic<bool> progress;
+	std::atomic<bool> writemutex;
 	std::string LastEvent = "\t\t\t\t\t\t\t";
 
 };

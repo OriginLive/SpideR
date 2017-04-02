@@ -59,6 +59,7 @@
     </Bscmake>
     <Link>
       <AdditionalDependencies>libcurld.lib;curlpp_static.lib;gumbo.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Profile>true</Profile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
